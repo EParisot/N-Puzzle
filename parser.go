@@ -38,11 +38,11 @@ func (env *Env) parseFile() error {
 }
 
 func printUsage() {
-	fmt.Println(`Usage : N-Puzzle map_file [-m map] [-i image] [-a heuristic] [-d difficulty]
-		with -m map	   	   = 'map_file.map' 
-			 -a heuristic  = 'heuristic name' (default manhattan distance)
-			 -i image      = 'image_file.png'
-			 -d difficulty = 'E'asy, 'M'edium, 'H'ard`)
+	fmt.Println(`Usage : N-Puzzle map_file [-m map] [-i image] [-d difficulty] [-a heuristic]
+		with -m map	   	   = 'map_file.map'
+		     -i image      = 'image_file.png'
+			 -d difficulty = 'E[asy]', 'M[edium]', 'H[ard]'
+			 -a heuristic  = 'heuristic' (default 'manhattan distance')`)
 }
 
 func (env *Env) parseArgs() error {
@@ -50,12 +50,14 @@ func (env *Env) parseArgs() error {
 		printUsage()
 	}
 	for i, arg := range os.Args {
-		if arg == "-i" && i+1 < len(os.Args) {
+		if arg == "-m" && i+1 < len(os.Args) &&
+			strings.HasSuffix(os.Args[i+1], ".map") {
+			env.mapFile = os.Args[i+1]
+		} else if arg == "-i" && i+1 < len(os.Args) &&
+			strings.HasSuffix(os.Args[i+1], ".png") {
 			env.imgFile = os.Args[i+1]
 		} else if arg == "-d" && i+1 < len(os.Args) {
 			env.difficulty = os.Args[i+1]
-		} else if arg == "-m" && i+1 < len(os.Args) {
-			env.mapFile = os.Args[i+1]
 		} else if arg == "-a" && i+1 < len(os.Args) {
 			env.autoMode = true
 			env.heuristic = os.Args[i+1]
