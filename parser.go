@@ -23,16 +23,10 @@ func (env *Env) parseFile() error {
 	defer file.Close()
 	reader := bufio.NewReader(file)
 	// Read size
-	firstLine, err := parseLine(reader)
-	if len(strings.Fields(firstLine)) == 0 ||
-		len(strings.Fields(firstLine)) > 1 {
-		return errors.New("missing 'size' value")
+	err = env.readSize(reader)
+	if err != nil {
+		return err
 	}
-	size, err := strconv.Atoi(firstLine)
-	if err != nil || size < 3 {
-		return errors.New("invalid 'size' value")
-	}
-	env.size = size
 	// Read map
 	err = env.readMap(reader)
 	if err != nil {
@@ -55,29 +49,43 @@ func (env *Env) parseArgs() error {
 	return nil
 }
 
+func (env *Env) readSize(reader *bufio.Reader) error {
+	firstLine, err := parseLine(reader)
+	if len(strings.Fields(firstLine)) == 0 ||
+		len(strings.Fields(firstLine)) > 1 {
+		return errors.New("missing size value")
+	}
+	size, err := strconv.Atoi(firstLine)
+	if err != nil || size < 3 {
+		return errors.New("invalid size value")
+	}
+	env.size = size
+	return nil
+}
+
 func (env *Env) readMap(reader *bufio.Reader) error {
-	env.grid = make([]*cell, env.size*env.size)
-	n := 0
 	for j := 0; j < env.size; j++ {
 		line, err := parseLine(reader)
 		if err != nil {
 			return err
 		}
 		ids := strings.Fields(line)
-		if len(ids) != 3 {
-			return errors.New("invalid line in file")
+		if len(ids) != env.size {
+			return errors.New("invalid map size")
 		}
 		for i, val := range ids {
 			valInt, err := strconv.Atoi(val)
-			if err != nil {
-				return errors.New("invalid value in file")
+			if err != nil || valInt > env.size*env.size || valInt < 0 {
+				return errors.New("invalid cell id")
 			}
-			env.grid[n] = &cell{
+			if env.isPresent(valInt) {
+				return errors.New("duplicated cell id")
+			}
+			env.grid = append(env.grid, &cell{
 				id: valInt,
 				X:  i,
 				Y:  j,
-			}
-			n++
+			})
 		}
 	}
 	return nil
@@ -91,4 +99,13 @@ func parseLine(reader *bufio.Reader) (string, error) {
 	lineStr := string(line)
 	lineTab := strings.Split(lineStr, "#")
 	return lineTab[0], nil
+}
+
+func (env *Env) isPresent(idToTest int) bool {
+	for _, cellID := range env.grid {
+		if cellID.id == idToTest {
+			return true
+		}
+	}
+	return false
 }
