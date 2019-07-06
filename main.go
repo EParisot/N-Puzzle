@@ -9,9 +9,13 @@ import (
 
 // Env main game struct
 type Env struct {
-	grid []*cell
-	size int
-	mode string
+	mapFile    string
+	imgFile    string
+	difficulty string
+	grid       []*cell
+	size       int
+	autoMode   bool
+	heuristic  string
 }
 
 type cell struct {
@@ -22,7 +26,7 @@ type cell struct {
 }
 
 func main() {
-	env := Env{}
+	env := Env{autoMode: false}
 	err := env.parseFile()
 	if err != nil {
 		log.Fatal(err)
@@ -32,4 +36,6 @@ func main() {
 	for i := range env.grid {
 		fmt.Println(env.grid[i])
 	}
+	//TODO start GUI + manual controls
+	//TODO start Algo
 }

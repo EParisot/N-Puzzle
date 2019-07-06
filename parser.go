@@ -15,36 +15,56 @@ func (env *Env) parseFile() error {
 	if err != nil {
 		return err
 	}
-	// Read file
-	file, err := os.Open(os.Args[1])
-	if err != nil {
-		return (err)
-	}
-	defer file.Close()
-	reader := bufio.NewReader(file)
-	// Read size
-	err = env.readSize(reader)
-	if err != nil {
-		return err
-	}
-	// Read map
-	err = env.readMap(reader)
-	if err != nil {
-		return err
+	if env.mapFile != "" {
+		// Read file
+		file, err := os.Open(env.mapFile)
+		if err != nil {
+			return (err)
+		}
+		defer file.Close()
+		reader := bufio.NewReader(file)
+		// Read size
+		err = env.readSize(reader)
+		if err != nil {
+			return err
+		}
+		// Read map
+		err = env.readMap(reader)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
 
+func printUsage() {
+	fmt.Println(`Usage : N-Puzzle map_file [-m map] [-i image] [-a] [-d difficulty] [-h heuristic]
+		with -m map	   = 'map_file.map' 
+			 -h heuristic  = 'md' for Manhattan Distance, WIP...
+			 -i image      = 'image_file.png'
+			 -d difficulty = 'E'asy, 'M'edium, 'H'ard
+			 -a auto`)
+}
+
 func (env *Env) parseArgs() error {
 	if len(os.Args[1:]) < 1 {
-		fmt.Println(`Usage : N-Puzzle map_file [-m heuristic]
-		with heuristic = 'md' for Manhattan Distance, WIP...`)
-		return errors.New("missing argument")
+		printUsage()
 	}
 	for i, arg := range os.Args {
-		if arg == "-m" && i+1 < len(os.Args) {
-			env.mode = os.Args[i+1]
+		if arg == "-i" && i+1 < len(os.Args) {
+			env.imgFile = os.Args[i+1]
+		} else if arg == "-a" {
+			env.autoMode = true
+		} else if arg == "-d" && i+1 < len(os.Args) {
+			env.difficulty = os.Args[i+1]
+		} else if arg == "-m" && i+1 < len(os.Args) {
+			env.mapFile = os.Args[i+1]
+		} else if arg == "-h" && i+1 < len(os.Args) {
+			env.heuristic = os.Args[i+1]
 		}
+	}
+	if env.mapFile == "" {
+		env.buildMap()
 	}
 	return nil
 }
@@ -53,11 +73,11 @@ func (env *Env) readSize(reader *bufio.Reader) error {
 	firstLine, err := parseLine(reader)
 	if len(strings.Fields(firstLine)) == 0 ||
 		len(strings.Fields(firstLine)) > 1 {
-		return errors.New("missing size value")
+		return errors.New("error missing size value")
 	}
 	size, err := strconv.Atoi(firstLine)
 	if err != nil || size < 3 {
-		return errors.New("invalid size value")
+		return errors.New("error invalid size value")
 	}
 	env.size = size
 	return nil
@@ -71,15 +91,15 @@ func (env *Env) readMap(reader *bufio.Reader) error {
 		}
 		ids := strings.Fields(line)
 		if len(ids) != env.size {
-			return errors.New("invalid map size")
+			return errors.New("error invalid map size")
 		}
 		for i, val := range ids {
 			valInt, err := strconv.Atoi(val)
 			if err != nil || valInt > env.size*env.size || valInt < 0 {
-				return errors.New("invalid cell id")
+				return errors.New("error invalid cell id")
 			}
 			if env.isPresent(valInt) {
-				return errors.New("duplicated cell id")
+				return errors.New("error duplicated cell id")
 			}
 			env.grid = append(env.grid, &cell{
 				id: valInt,
@@ -94,7 +114,7 @@ func (env *Env) readMap(reader *bufio.Reader) error {
 func parseLine(reader *bufio.Reader) (string, error) {
 	line, _, err := reader.ReadLine()
 	if err != nil {
-		return "", errors.New("Error Reading map file")
+		return "", errors.New("error reading map file")
 	}
 	lineStr := string(line)
 	lineTab := strings.Split(lineStr, "#")
