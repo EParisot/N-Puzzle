@@ -35,6 +35,10 @@ func main() {
 	for i := range env.grid {
 		fmt.Println(i, env.grid[i])
 	}
+	env.CropImage("images/pickatchu.png")
+	if err := ebiten.Run(env.update, 300, 300, 2, "Hello, World!"); err != nil {
+		log.Fatal(err)
+	}
 	fmt.Println(env.isFinished())
 	//TODO start GUI + manual controls
 	//TODO start Algo
