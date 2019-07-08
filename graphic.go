@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
@@ -16,15 +17,33 @@ import (
 	"github.com/oliamb/cutter"
 )
 
+const (
+	UP    = 1
+	DOWN  = 2
+	LEFT  = 3
+	RIGHT = 4
+
+	DELAY = time.Second
+)
+
 var square *ebiten.Image
 
 func (env *Env) update(screen *ebiten.Image) error {
 
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		env.Move_cell(UP)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		env.Move_cell(DOWN)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		env.Move_cell(LEFT)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		env.Move_cell(RIGHT)
+	}
 	// Fill the screen with #FF0000 color
 	screen.Fill(color.NRGBA{0xff, 0x00, 0x00, 0xff})
-
-	// Display the text though the debug function
-	ebitenutil.DebugPrint(screen, "Our first game in Ebiten!")
 
 	for i := range env.grid {
 		if i == 0 {
@@ -42,6 +61,60 @@ func (env *Env) update(screen *ebiten.Image) error {
 	return nil
 }
 
+func (env *Env) Move_cell(direction int) {
+
+	if direction == UP {
+		if env.grid[0].Y == env.size-1 {
+			fmt.Println("You can't do that")
+		} else {
+			for i := range env.grid {
+				if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y+1 {
+					env.grid[0].Y++
+					env.grid[i].Y--
+					break
+				}
+			}
+		}
+	} else if direction == DOWN {
+		if env.grid[0].Y == 0 {
+			fmt.Println("You can't do that")
+		} else {
+			for i := range env.grid {
+				if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y-1 {
+					env.grid[0].Y--
+					env.grid[i].Y++
+					break
+				}
+			}
+		}
+	} else if direction == LEFT {
+		if env.grid[0].X == env.size-1 {
+			fmt.Println("You can't do that")
+		} else {
+			for i := range env.grid {
+				if env.grid[i].X == env.grid[0].X+1 && env.grid[i].Y == env.grid[0].Y {
+					env.grid[0].X++
+					env.grid[i].X--
+					break
+				}
+			}
+		}
+	} else if direction == RIGHT {
+		if env.grid[0].X == 0 {
+			fmt.Println("You can't do that")
+		} else {
+			for i := range env.grid {
+				if env.grid[i].X == env.grid[0].X-1 && env.grid[i].Y == env.grid[0].Y {
+					env.grid[0].X--
+					env.grid[i].X++
+					break
+				}
+			}
+		}
+	}
+	time.Sleep(DELAY)
+}
+
 func (env *Env) Addsquare(x float64, y float64, square *ebiten.Image, screen *ebiten.Image, i int) {
 
 	var err error
@@ -52,9 +125,6 @@ func (env *Env) Addsquare(x float64, y float64, square *ebiten.Image, screen *eb
 			log.Fatal(err)
 		}
 	}
-
-	// Fill the square with the white color
-	//square.Fill(color.RGBA{0xff, uint8(colors), 0, 0xff})
 
 	// The previous empty option struct
 	opts := &ebiten.DrawImageOptions{}
@@ -77,11 +147,8 @@ func (env *Env) CropImage(images string) {
 		log.Fatal("Cannot decode image:", err)
 	}
 
-	//Size the image
-
+	//Resize the picture
 	newImage := resize.Resize(300, 300, img, resize.Lanczos3)
-
-	//fmt.Println(newImage)
 
 	//Clean the .tmp directory
 	err = RemoveContents(".tmp")
@@ -100,8 +167,6 @@ func (env *Env) CropImage(images string) {
 		if i == 0 {
 			continue
 		}
-		fmt.Println("position_x = ", position_x)
-		fmt.Println("position_y = ", position_y)
 		cImg, err := cutter.Crop(newImage, cutter.Config{
 			Height:  (300 / env.size),                                                          // height in pixel or Y ratio(see Ratio Option below)
 			Width:   (300 / env.size),                                                          // width in pixel or X ratio
