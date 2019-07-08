@@ -86,6 +86,7 @@ func (env *Env) readSize(reader *bufio.Reader) error {
 }
 
 func (env *Env) readMap(reader *bufio.Reader) error {
+	env.grid = make([]*cell, env.size*env.size)
 	for j := 0; j < env.size; j++ {
 		line, err := parseLine(reader)
 		if err != nil {
@@ -97,17 +98,16 @@ func (env *Env) readMap(reader *bufio.Reader) error {
 		}
 		for i, val := range ids {
 			valInt, err := strconv.Atoi(val)
-			if err != nil || valInt > env.size*env.size || valInt < 0 {
+			if err != nil || valInt >= env.size*env.size || valInt < 0 {
 				return errors.New("error invalid cell id")
 			}
 			if env.isPresent(valInt) {
 				return errors.New("error duplicated cell id")
 			}
-			env.grid = append(env.grid, &cell{
-				id: valInt,
-				X:  i,
-				Y:  j,
-			})
+			env.grid[valInt] = &cell{
+				X: i,
+				Y: j,
+			}
 		}
 	}
 	return nil
@@ -121,13 +121,4 @@ func parseLine(reader *bufio.Reader) (string, error) {
 	lineStr := string(line)
 	lineTab := strings.Split(lineStr, "#")
 	return lineTab[0], nil
-}
-
-func (env *Env) isPresent(idToTest int) bool {
-	for _, cellID := range env.grid {
-		if cellID.id == idToTest {
-			return true
-		}
-	}
-	return false
 }
