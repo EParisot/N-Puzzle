@@ -64,7 +64,9 @@ func (env *Env) parseArgs() error {
 		}
 	}
 	if env.mapFile == "" {
-		env.buildMap()
+		if env.difficulty != "" {
+			env.buildMap()
+		}
 	}
 	return nil
 }
