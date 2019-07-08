@@ -10,5 +10,6 @@ func (env *Env) isPresent(idToTest int) bool {
 }
 
 func (env *Env) isFinished() bool {
+
 	return true
 }
