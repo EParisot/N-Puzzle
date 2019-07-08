@@ -19,7 +19,6 @@ type Env struct {
 }
 
 type cell struct {
-	id  int
 	X   int
 	Y   int
 	img *ebiten.Image
@@ -34,8 +33,9 @@ func main() {
 	//DEBUG
 	fmt.Println("size : ", env.size)
 	for i := range env.grid {
-		fmt.Println(env.grid[i])
+		fmt.Println(i, env.grid[i])
 	}
+	fmt.Println(env.isFinished())
 	//TODO start GUI + manual controls
 	//TODO start Algo
 }
