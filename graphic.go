@@ -23,7 +23,7 @@ const (
 	LEFT  = 3
 	RIGHT = 4
 
-	DELAY = time.Second
+	DELAY = time.Second / 4
 )
 
 var square *ebiten.Image

@@ -35,8 +35,8 @@ func main() {
 	for i := range env.grid {
 		fmt.Println(i, env.grid[i])
 	}
-	env.CropImage("images/pickatchu.png")
-	if err := ebiten.Run(env.update, 300, 300, 2, "Hello, World!"); err != nil {
+	env.CropImage(env.imgFile)
+	if err := ebiten.Run(env.update, 300, 300, 2, "N-Puzzle"); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(env.isFinished())
