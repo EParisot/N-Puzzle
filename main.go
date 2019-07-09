@@ -37,7 +37,7 @@ func main() {
 		fmt.Println(i, env.grid[i])
 	}
 	env.cropImage(env.imgFile)
-	go env.getKey()
+	//go env.getKey()
 	if err := ebiten.Run(env.update, 300, 300, 2, "N-Puzzle"); err != nil {
 		log.Fatal(err)
 	}
