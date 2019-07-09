@@ -35,11 +35,11 @@ func main() {
 	for i := range env.grid {
 		fmt.Println(i, env.grid[i])
 	}
-	env.CropImage(env.imgFile)
+	env.cropImage(env.imgFile)
+	go env.getKey()
 	if err := ebiten.Run(env.update, 300, 300, 2, "N-Puzzle"); err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println(env.isFinished())
-	//TODO start GUI + manual controls
 	//TODO start Algo
 }
