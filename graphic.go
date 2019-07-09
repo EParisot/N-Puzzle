@@ -34,9 +34,6 @@ func (env *Env) update(screen *ebiten.Image) error {
 	env.getKey()
 
 	for i := range env.grid {
-		if i == 0 {
-			continue
-		}
 		//Add cells
 		env.addSquare(float64(env.grid[i].X*(env.sizeWindows/env.size)),
 			float64(env.grid[i].Y*(env.sizeWindows/env.size)),
@@ -124,9 +121,14 @@ func (env *Env) addSquare(x float64, y float64, square *ebiten.Image, screen *eb
 
 	var err error
 
-	square, err = ebiten.NewImageFromImage(env.grid[i].cellImg, ebiten.FilterDefault)
-	if err != nil {
-		log.Fatal("Error new images", err)
+	if i != 0 {
+		square, err = ebiten.NewImageFromImage(env.grid[i].cellImg, ebiten.FilterDefault)
+		if err != nil {
+			log.Fatal("Error new images", err)
+		}
+	} else {
+		square, _ = ebiten.NewImage((env.sizeWindows / env.size), (env.sizeWindows / env.size), ebiten.FilterNearest)
+		square.Fill(color.Black)
 	}
 
 	opts := &ebiten.DrawImageOptions{}

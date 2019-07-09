@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	"log"
 
@@ -32,13 +31,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//DEBUG
-	fmt.Println("size : ", env.size)
-	for i := range env.grid {
-		fmt.Println(i, env.grid[i])
-	}
 	//Find the perfect size for the windows
 	env.sizeWindows = 300 + (300 % env.size)
+	// Default images
+	if env.imgFile == "" {
+		env.imgFile = "images/default.png"
+	}
 	env.cropImage(env.imgFile)
 	//go env.getKey()
 	if err := ebiten.Run(env.update, env.sizeWindows, env.sizeWindows, 2, "N-Puzzle"); err != nil {
