@@ -32,9 +32,6 @@ func main() {
 		log.Fatal(err)
 	}
 	//Find the perfect size for the windows
-	if env.size == 0 {
-		log.Fatal("Error in input maps")
-	}
 	env.sizeWindows = 300 + (300 % env.size)
 	// Default images
 	if env.imgFile == "" {
