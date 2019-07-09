@@ -46,4 +46,5 @@ func main() {
 		log.Fatal(err)
 	}
 	//TODO start Algo
+	go env.botPlayer()
 }
