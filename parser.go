@@ -39,15 +39,16 @@ func (env *Env) parseFile() error {
 
 func printUsage() {
 	fmt.Println(`Usage : N-Puzzle map_file [-m map] [-i image] [-d difficulty] [-a heuristic]
-		with -m map	   	   = 'map_file.map'
-		     -i image      = 'image_file.png'
-			 -d difficulty = 'E[asy]', 'M[edium]', 'H[ard]'
-			 -a heuristic  = 'heuristic' (default 'manhattan distance')`)
+			-m map        = 'map_file.map'
+			-i image      = 'image_file.png'
+			-d difficulty = 'E[asy]', 'M[edium]', 'H[ard]'
+			-a heuristic  = 'heuristic' (default 'manhattan distance')`)
 }
 
 func (env *Env) parseArgs() error {
 	if len(os.Args[1:]) < 1 {
 		printUsage()
+		return errors.New("")
 	}
 	for i, arg := range os.Args {
 		if arg == "-m" && i+1 < len(os.Args) &&
