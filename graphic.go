@@ -23,25 +23,13 @@ const (
 	LEFT  = 3
 	RIGHT = 4
 
-	DELAY = time.Second / 4
+	DELAY = time.Second / 8
 )
 
 var square *ebiten.Image
 
 func (env *Env) update(screen *ebiten.Image) error {
 
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		env.Move_cell(UP)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		env.Move_cell(DOWN)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		env.Move_cell(LEFT)
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		env.Move_cell(RIGHT)
-	}
 	// Fill the screen with #FF0000 color
 	screen.Fill(color.NRGBA{0xff, 0x00, 0x00, 0xff})
 
@@ -49,7 +37,7 @@ func (env *Env) update(screen *ebiten.Image) error {
 		if i == 0 {
 			continue
 		}
-		env.Addsquare(float64(env.grid[i].X*(300/env.size)),
+		env.addSquare(float64(env.grid[i].X*(300/env.size)),
 			float64(env.grid[i].Y*(300/env.size)),
 			square,
 			screen,
@@ -61,7 +49,29 @@ func (env *Env) update(screen *ebiten.Image) error {
 	return nil
 }
 
-func (env *Env) Move_cell(direction int) {
+func (env *Env) getKey() {
+	for {
+		if ebiten.IsKeyPressed(ebiten.KeyUp) {
+			env.moveCell(UP)
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyDown) {
+			env.moveCell(DOWN)
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+			env.moveCell(LEFT)
+		}
+		if ebiten.IsKeyPressed(ebiten.KeyRight) {
+			env.moveCell(RIGHT)
+		}
+		if env.isFinished() {
+			//TODO GAME OVER
+			return
+		}
+		time.Sleep(DELAY)
+	}
+}
+
+func (env *Env) moveCell(direction int) {
 
 	if direction == UP {
 		if env.grid[0].Y == env.size-1 {
@@ -112,10 +122,9 @@ func (env *Env) Move_cell(direction int) {
 			}
 		}
 	}
-	time.Sleep(DELAY)
 }
 
-func (env *Env) Addsquare(x float64, y float64, square *ebiten.Image, screen *ebiten.Image, i int) {
+func (env *Env) addSquare(x float64, y float64, square *ebiten.Image, screen *ebiten.Image, i int) {
 
 	var err error
 
@@ -136,7 +145,7 @@ func (env *Env) Addsquare(x float64, y float64, square *ebiten.Image, screen *eb
 
 }
 
-func (env *Env) CropImage(images string) {
+func (env *Env) cropImage(images string) {
 
 	f, err := os.Open(images)
 	if err != nil {
@@ -151,7 +160,7 @@ func (env *Env) CropImage(images string) {
 	newImage := resize.Resize(300, 300, img, resize.Lanczos3)
 
 	//Clean the .tmp directory
-	err = RemoveContents(".tmp")
+	err = removeContents(".tmp")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -220,7 +229,7 @@ func (env *Env) CropImage(images string) {
 
 }
 
-func RemoveContents(dir string) error {
+func removeContents(dir string) error {
 	d, err := os.Open(dir)
 	if err != nil {
 		return err
