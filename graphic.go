@@ -35,8 +35,8 @@ func (env *Env) update(screen *ebiten.Image) error {
 			continue
 		}
 		//Add cells
-		env.addSquare(float64(env.grid[i].X*(300/env.size)),
-			float64(env.grid[i].Y*(300/env.size)),
+		env.addSquare(float64(env.grid[i].X*(env.sizeWindows/env.size)),
+			float64(env.grid[i].Y*(env.sizeWindows/env.size)),
 			square,
 			screen,
 			i,
@@ -140,7 +140,6 @@ func (env *Env) addSquare(x float64, y float64, square *ebiten.Image, screen *eb
 
 func (env *Env) cropImage(images string) {
 
-	fmt.Println(images)
 	f, err := os.Open(images)
 	if err != nil {
 		log.Fatal("Cannot open file", err)
@@ -150,9 +149,8 @@ func (env *Env) cropImage(images string) {
 	if err != nil {
 		log.Fatal("Cannot decode image:", err)
 	}
-
-	//Resize the picture to 300 * 300
-	newImage := resize.Resize(300, 300, img, resize.Lanczos3)
+	//Resize the picture to sizeWindows
+	newImage := resize.Resize(uint(env.sizeWindows), uint(env.sizeWindows), img, resize.Lanczos3)
 
 	position_x := 0
 	position_y := 0
@@ -166,11 +164,11 @@ func (env *Env) cropImage(images string) {
 		}
 		// Crop the image to multiple square
 		cImg, err := cutter.Crop(newImage, cutter.Config{
-			Height:  (300 / env.size),                                                          // height in pixel or Y ratio(see Ratio Option below)
-			Width:   (300 / env.size),                                                          // width in pixel or X ratio
-			Mode:    cutter.TopLeft,                                                            // Accepted Mode: TopLeft, Centered
-			Anchor:  image.Point{position_x * (300 / env.size), position_y * (300 / env.size)}, // Position of the top left point
-			Options: 0,                                                                         // Accepted Option: Ratio
+			Height:  (env.sizeWindows / env.size),                                                          // height in pixel or Y ratio(see Ratio Option below)
+			Width:   (env.sizeWindows / env.size),                                                          // width in pixel or X ratio
+			Mode:    cutter.TopLeft,                                                                        // Accepted Mode: TopLeft, Centered
+			Anchor:  image.Point{position_x * (env.sizeWindows / env.size), position_y * (300 / env.size)}, // Position of the top left point
+			Options: 0,                                                                                     // Accepted Option: Ratio
 		})
 		if err != nil {
 			fmt.Println(err)

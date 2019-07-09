@@ -10,13 +10,14 @@ import (
 
 // Env main game struct
 type Env struct {
-	mapFile    string
-	imgFile    string
-	difficulty string
-	grid       []*cell
-	size       int
-	autoMode   bool
-	heuristic  string
+	mapFile     string
+	imgFile     string
+	difficulty  string
+	grid        []*cell
+	size        int
+	sizeWindows int
+	autoMode    bool
+	heuristic   string
 }
 
 type cell struct {
@@ -36,9 +37,11 @@ func main() {
 	for i := range env.grid {
 		fmt.Println(i, env.grid[i])
 	}
+	//Find the perfect size for the windows
+	env.sizeWindows = 300 + (300 % env.size)
 	env.cropImage(env.imgFile)
 	go env.getKey()
-	if err := ebiten.Run(env.update, 300, 300, 2, "N-Puzzle"); err != nil {
+	if err := ebiten.Run(env.update, env.sizeWindows, env.sizeWindows, 2, "N-Puzzle"); err != nil {
 		log.Fatal(err)
 	}
 	//TODO start Algo
