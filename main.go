@@ -26,7 +26,7 @@ type cell struct {
 }
 
 func main() {
-	env := Env{autoMode: false}
+	env := Env{}
 	err := env.parseFile()
 	if err != nil {
 		log.Fatal(err)
