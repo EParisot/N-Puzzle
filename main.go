@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"log"
 
 	"github.com/hajimehoshi/ebiten"
@@ -19,9 +20,9 @@ type Env struct {
 }
 
 type cell struct {
-	X   int
-	Y   int
-	img *ebiten.Image
+	X       int
+	Y       int
+	cellImg image.Image
 }
 
 func main() {
@@ -40,6 +41,5 @@ func main() {
 	if err := ebiten.Run(env.update, 300, 300, 2, "N-Puzzle"); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(env.isFinished())
 	//TODO start Algo
 }

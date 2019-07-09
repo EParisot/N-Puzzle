@@ -7,12 +7,9 @@ import (
 	"image/png"
 	"log"
 	"os"
-	"path/filepath"
-	"strconv"
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 	"github.com/nfnt/resize"
 	"github.com/oliamb/cutter"
 )
@@ -30,13 +27,14 @@ var square *ebiten.Image
 
 func (env *Env) update(screen *ebiten.Image) error {
 
-	// Fill the screen with #FF0000 color
+	//Fill the screen with background color
 	screen.Fill(color.NRGBA{0xff, 0x00, 0x00, 0xff})
 
 	for i := range env.grid {
 		if i == 0 {
 			continue
 		}
+		//Add cells
 		env.addSquare(float64(env.grid[i].X*(300/env.size)),
 			float64(env.grid[i].Y*(300/env.size)),
 			square,
@@ -44,7 +42,6 @@ func (env *Env) update(screen *ebiten.Image) error {
 			i,
 		)
 	}
-	// Draw the square image to the screen with an empty option
 
 	return nil
 }
@@ -128,43 +125,34 @@ func (env *Env) addSquare(x float64, y float64, square *ebiten.Image, screen *eb
 
 	var err error
 
-	if square == nil {
-		square, _, err = ebitenutil.NewImageFromFile(".tmp/"+strconv.Itoa(i)+".png", ebiten.FilterDefault)
-		if err != nil {
-			log.Fatal(err)
-		}
+	square, err = ebiten.NewImageFromImage(env.grid[i].cellImg, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal("Error new images", err)
 	}
 
-	// The previous empty option struct
 	opts := &ebiten.DrawImageOptions{}
 
 	// Add the Translate effect to the option struct.
 	opts.GeoM.Translate(x, y)
 	screen.DrawImage(square, opts)
-	// Draw the square image to the screen with an empty option
 
 }
 
 func (env *Env) cropImage(images string) {
 
+	fmt.Println(images)
 	f, err := os.Open(images)
 	if err != nil {
 		log.Fatal("Cannot open file", err)
 	}
-	img, _, err := image.Decode(f)
+	// Accept for now only png
+	img, err := png.Decode(f)
 	if err != nil {
 		log.Fatal("Cannot decode image:", err)
 	}
 
-	//Resize the picture
+	//Resize the picture to 300 * 300
 	newImage := resize.Resize(300, 300, img, resize.Lanczos3)
-
-	//Clean the .tmp directory
-	err = removeContents(".tmp")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 
 	position_x := 0
 	position_y := 0
@@ -176,6 +164,7 @@ func (env *Env) cropImage(images string) {
 		if i == 0 {
 			continue
 		}
+		// Crop the image to multiple square
 		cImg, err := cutter.Crop(newImage, cutter.Config{
 			Height:  (300 / env.size),                                                          // height in pixel or Y ratio(see Ratio Option below)
 			Width:   (300 / env.size),                                                          // width in pixel or X ratio
@@ -187,18 +176,9 @@ func (env *Env) cropImage(images string) {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		// Each cell fill with a square of the image
+		env.grid[i].cellImg = cImg
 
-		out, err := os.Create(".tmp/" + strconv.Itoa(i) + ".png")
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		err = png.Encode(out, cImg)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		out.Close()
 		if countCell+offset == env.size-1 {
 			countCell = 0
 			if countSide%2 == 0 {
@@ -226,24 +206,4 @@ func (env *Env) cropImage(images string) {
 		}
 	}
 	f.Close()
-
-}
-
-func removeContents(dir string) error {
-	d, err := os.Open(dir)
-	if err != nil {
-		return err
-	}
-	defer d.Close()
-	names, err := d.Readdirnames(-1)
-	if err != nil {
-		return err
-	}
-	for _, name := range names {
-		err = os.RemoveAll(filepath.Join(dir, name))
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
