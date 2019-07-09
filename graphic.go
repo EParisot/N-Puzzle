@@ -68,7 +68,6 @@ func (env *Env) moveCell(direction int) {
 
 	if direction == UP {
 		if env.grid[0].Y == env.size-1 {
-			fmt.Println("You can't do that")
 		} else {
 			for i := range env.grid {
 				if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y+1 {
@@ -80,7 +79,6 @@ func (env *Env) moveCell(direction int) {
 		}
 	} else if direction == DOWN {
 		if env.grid[0].Y == 0 {
-			fmt.Println("You can't do that")
 		} else {
 			for i := range env.grid {
 				if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y-1 {
@@ -92,7 +90,6 @@ func (env *Env) moveCell(direction int) {
 		}
 	} else if direction == LEFT {
 		if env.grid[0].X == env.size-1 {
-			fmt.Println("You can't do that")
 		} else {
 			for i := range env.grid {
 				if env.grid[i].X == env.grid[0].X+1 && env.grid[i].Y == env.grid[0].Y {
@@ -104,7 +101,6 @@ func (env *Env) moveCell(direction int) {
 		}
 	} else if direction == RIGHT {
 		if env.grid[0].X == 0 {
-			fmt.Println("You can't do that")
 		} else {
 			for i := range env.grid {
 				if env.grid[i].X == env.grid[0].X-1 && env.grid[i].Y == env.grid[0].Y {
