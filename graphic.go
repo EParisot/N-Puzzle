@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/inpututil"
 	"github.com/nfnt/resize"
 	"github.com/oliamb/cutter"
 )
@@ -20,7 +21,7 @@ const (
 	LEFT  = 3
 	RIGHT = 4
 
-	DELAY = time.Second / 8
+	DELAY = time.Second / 4
 )
 
 var square *ebiten.Image
@@ -29,6 +30,8 @@ func (env *Env) update(screen *ebiten.Image) error {
 
 	//Fill the screen with background color
 	screen.Fill(color.NRGBA{0xff, 0x00, 0x00, 0xff})
+	//Handle controls
+	env.getKey()
 
 	for i := range env.grid {
 		if i == 0 {
@@ -47,24 +50,20 @@ func (env *Env) update(screen *ebiten.Image) error {
 }
 
 func (env *Env) getKey() {
-	for {
-		if ebiten.IsKeyPressed(ebiten.KeyUp) {
-			env.moveCell(UP)
-		}
-		if ebiten.IsKeyPressed(ebiten.KeyDown) {
-			env.moveCell(DOWN)
-		}
-		if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-			env.moveCell(LEFT)
-		}
-		if ebiten.IsKeyPressed(ebiten.KeyRight) {
-			env.moveCell(RIGHT)
-		}
-		if env.isFinished() {
-			//TODO GAME OVER
-			return
-		}
-		time.Sleep(DELAY)
+	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+		env.moveCell(UP)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+		env.moveCell(DOWN)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+		env.moveCell(LEFT)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+		env.moveCell(RIGHT)
+	}
+	if env.isFinished() {
+		return
 	}
 }
 

@@ -40,7 +40,7 @@ func main() {
 	//Find the perfect size for the windows
 	env.sizeWindows = 300 + (300 % env.size)
 	env.cropImage(env.imgFile)
-	go env.getKey()
+	//go env.getKey()
 	if err := ebiten.Run(env.update, env.sizeWindows, env.sizeWindows, 2, "N-Puzzle"); err != nil {
 		log.Fatal(err)
 	}
