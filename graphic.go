@@ -30,7 +30,7 @@ func (env *Env) update(screen *ebiten.Image) error {
 
 	//Fill the screen with background color
 	screen.Fill(color.NRGBA{0xff, 0x00, 0x00, 0xff})
-
+	//Handle controls
 	env.getKey()
 
 	for i := range env.grid {
@@ -50,7 +50,6 @@ func (env *Env) update(screen *ebiten.Image) error {
 }
 
 func (env *Env) getKey() {
-	//for {
 	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
 		env.moveCell(UP)
 	}
@@ -64,13 +63,9 @@ func (env *Env) getKey() {
 		env.moveCell(RIGHT)
 	}
 	if env.isFinished() {
-		//TODO GAME OVER
 		return
 	}
-	//		time.Sleep(DELAY)
 }
-
-//}
 
 func (env *Env) moveCell(direction int) {
 
