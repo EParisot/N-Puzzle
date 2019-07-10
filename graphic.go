@@ -49,65 +49,49 @@ func (env *Env) update(screen *ebiten.Image) error {
 func (env *Env) getKey() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
 		env.moveCell(UP)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
 		env.moveCell(DOWN)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
 		env.moveCell(LEFT)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
 		env.moveCell(RIGHT)
-	}
-	if env.isFinished() {
+	} else if env.isFinished() {
 		return
 	}
 }
 
 func (env *Env) moveCell(direction int) {
 
-	if direction == UP {
-		if env.grid[0].Y == env.size-1 {
-		} else {
-			for i := range env.grid {
-				if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y+1 {
-					env.grid[0].Y++
-					env.grid[i].Y--
-					break
-				}
+	if direction == UP && env.grid[0].Y != env.size-1 {
+		for i := range env.grid {
+			if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y+1 {
+				env.grid[0].Y++
+				env.grid[i].Y--
+				break
 			}
 		}
-	} else if direction == DOWN {
-		if env.grid[0].Y == 0 {
-		} else {
-			for i := range env.grid {
-				if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y-1 {
-					env.grid[0].Y--
-					env.grid[i].Y++
-					break
-				}
+	} else if direction == DOWN && env.grid[0].Y != 0 {
+		for i := range env.grid {
+			if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y-1 {
+				env.grid[0].Y--
+				env.grid[i].Y++
+				break
 			}
 		}
-	} else if direction == LEFT {
-		if env.grid[0].X == env.size-1 {
-		} else {
-			for i := range env.grid {
-				if env.grid[i].X == env.grid[0].X+1 && env.grid[i].Y == env.grid[0].Y {
-					env.grid[0].X++
-					env.grid[i].X--
-					break
-				}
+	} else if direction == LEFT && env.grid[0].X != env.size-1 {
+		for i := range env.grid {
+			if env.grid[i].X == env.grid[0].X+1 && env.grid[i].Y == env.grid[0].Y {
+				env.grid[0].X++
+				env.grid[i].X--
+				break
 			}
 		}
-	} else if direction == RIGHT {
-		if env.grid[0].X == 0 {
-		} else {
-			for i := range env.grid {
-				if env.grid[i].X == env.grid[0].X-1 && env.grid[i].Y == env.grid[0].Y {
-					env.grid[0].X--
-					env.grid[i].X++
-					break
-				}
+	} else if direction == RIGHT && env.grid[0].X != 0 {
+		for i := range env.grid {
+			if env.grid[i].X == env.grid[0].X-1 && env.grid[i].Y == env.grid[0].Y {
+				env.grid[0].X--
+				env.grid[i].X++
+				break
 			}
 		}
 	}

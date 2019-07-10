@@ -30,23 +30,32 @@ func (env *Env) algo() {
 func (env *Env) aStar() {
 	var closedList []*cell
 	var openList []*cell
-	// Append start node
-	openList = append(openList, &cell{})
+	// Append start node to open list
+	env.grid[0].cost = 0
+	env.grid[0].heuristic = env.globalManDist()
+	openList = append(openList, env.grid[0])
 	for len(openList) != 0 {
-		// Sort slice
+		// Sort open list by heuristic
 		sort.Slice(openList, func(i, j int) bool {
 			return openList[i].heuristic < openList[j].heuristic
 		})
-		// Unstack first
-		currNode := openList[0]
+		// Unstack first cell of open list
+		currPos := openList[0]
 		openList[0] = nil
 		openList = openList[1:]
 		// Check end
 		if env.isFinished() {
-			closedList = append(closedList, currNode)
+			closedList = append(closedList, currPos)
 			return
 		}
-		// Eval possible moves
+		//for each possible move
+		//	if already present in closedList
+		//		then continue
+		//	elif already present in openList with lower cost
+		//		then continue
+		//
+		//	append move to openList
+		//append move to closedList
 	}
 }
 
