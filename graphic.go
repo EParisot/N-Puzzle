@@ -33,10 +33,10 @@ func (env *Env) update(screen *ebiten.Image) error {
 	//Handle controls
 	env.getKey()
 
-	for i := range env.grid {
+	for i := range env.grid.mapping {
 		//Add cells
-		env.addSquare(float64(env.grid[i].X*(env.sizeWindows/env.size)),
-			float64(env.grid[i].Y*(env.sizeWindows/env.size)),
+		env.addSquare(float64(env.grid.mapping[i].X*(env.sizeWindows/env.size)),
+			float64(env.grid.mapping[i].Y*(env.sizeWindows/env.size)),
 			square,
 			screen,
 			i,
@@ -48,51 +48,63 @@ func (env *Env) update(screen *ebiten.Image) error {
 
 func (env *Env) getKey() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		env.moveCell(UP)
+		env.moveCell(env.grid, UP)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		env.moveCell(DOWN)
+		env.moveCell(env.grid, DOWN)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		env.moveCell(LEFT)
+		env.moveCell(env.grid, LEFT)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		env.moveCell(RIGHT)
+		env.moveCell(env.grid, RIGHT)
 	} else if env.isFinished() {
 		return
 	}
 }
 
-func (env *Env) moveCell(direction int) {
+func (env *Env) checkMove(currGrid *grid, move int) int {
+	if move == UP && currGrid.mapping[0].Y != env.size-1 {
+		for i := range currGrid.mapping {
+			if currGrid.mapping[i].X == currGrid.mapping[0].X && currGrid.mapping[i].Y == currGrid.mapping[0].Y+1 {
+				return i
+			}
+		}
+	} else if move == DOWN && currGrid.mapping[0].Y != 0 {
+		for i := range currGrid.mapping {
+			if currGrid.mapping[i].X == currGrid.mapping[0].X && currGrid.mapping[i].Y == currGrid.mapping[0].Y-1 {
+				return i
+			}
+		}
+	} else if move == LEFT && currGrid.mapping[0].X != env.size-1 {
+		for i := range currGrid.mapping {
+			if currGrid.mapping[i].X == currGrid.mapping[0].X+1 && currGrid.mapping[i].Y == currGrid.mapping[0].Y {
+				return i
+			}
+		}
+	} else if move == RIGHT && currGrid.mapping[0].X != 0 {
+		for i := range currGrid.mapping {
+			if currGrid.mapping[i].X == currGrid.mapping[0].X-1 && currGrid.mapping[i].Y == currGrid.mapping[0].Y {
+				return i
+			}
+		}
+	}
+	return -1
+}
 
-	if direction == UP && env.grid[0].Y != env.size-1 {
-		for i := range env.grid {
-			if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y+1 {
-				env.grid[0].Y++
-				env.grid[i].Y--
-				break
-			}
-		}
-	} else if direction == DOWN && env.grid[0].Y != 0 {
-		for i := range env.grid {
-			if env.grid[i].X == env.grid[0].X && env.grid[i].Y == env.grid[0].Y-1 {
-				env.grid[0].Y--
-				env.grid[i].Y++
-				break
-			}
-		}
-	} else if direction == LEFT && env.grid[0].X != env.size-1 {
-		for i := range env.grid {
-			if env.grid[i].X == env.grid[0].X+1 && env.grid[i].Y == env.grid[0].Y {
-				env.grid[0].X++
-				env.grid[i].X--
-				break
-			}
-		}
-	} else if direction == RIGHT && env.grid[0].X != 0 {
-		for i := range env.grid {
-			if env.grid[i].X == env.grid[0].X-1 && env.grid[i].Y == env.grid[0].Y {
-				env.grid[0].X--
-				env.grid[i].X++
-				break
-			}
+func (env *Env) moveCell(currGrid *grid, direction int) {
+	i := env.checkMove(currGrid, direction)
+	if i >= 0 {
+		switch {
+		case direction == UP:
+			currGrid.mapping[0].Y++
+			currGrid.mapping[i].Y--
+		case direction == DOWN:
+			currGrid.mapping[0].Y--
+			currGrid.mapping[i].Y++
+		case direction == LEFT:
+			currGrid.mapping[0].X++
+			currGrid.mapping[i].X--
+		case direction == RIGHT:
+			currGrid.mapping[0].X--
+			currGrid.mapping[i].X++
 		}
 	}
 }
@@ -102,7 +114,7 @@ func (env *Env) addSquare(x float64, y float64, square *ebiten.Image, screen *eb
 	var err error
 
 	if i != 0 {
-		square, err = ebiten.NewImageFromImage(env.grid[i].cellImg, ebiten.FilterDefault)
+		square, err = ebiten.NewImageFromImage(env.grid.mapping[i].cellImg, ebiten.FilterDefault)
 		if err != nil {
 			log.Fatal("Error new images", err)
 		}
@@ -139,7 +151,7 @@ func (env *Env) cropImage(images string) {
 	countCell := 0
 	offset := 0
 	way := 0
-	for i := range env.grid {
+	for i := range env.grid.mapping {
 		if i == 0 {
 			continue
 		}
@@ -156,7 +168,7 @@ func (env *Env) cropImage(images string) {
 			os.Exit(1)
 		}
 		// Each cell fill with a square of the image
-		env.grid[i].cellImg = cImg
+		env.grid.mapping[i].cellImg = cImg
 
 		if countCell+offset == env.size-1 {
 			countCell = 0

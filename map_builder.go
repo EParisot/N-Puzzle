@@ -15,7 +15,8 @@ func (env *Env) buildMap() {
 	case env.difficulty == "H" || env.difficulty == "Hard":
 		env.size = 16
 	}
-	env.grid = make([]*cell, env.size*env.size)
+	newMap := make([]*cell, env.size*env.size)
+	env.grid.mapping = newMap
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	newID := r.Intn(env.size * env.size)
 	fmt.Println("Building map...")
@@ -24,7 +25,7 @@ func (env *Env) buildMap() {
 			for env.isPresent(newID) {
 				newID = r.Intn(env.size * env.size)
 			}
-			env.grid[newID] = &cell{
+			env.grid.mapping[newID] = &cell{
 				X: x,
 				Y: y,
 			}
