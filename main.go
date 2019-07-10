@@ -13,6 +13,7 @@ type Env struct {
 	imgFile     string
 	difficulty  string
 	grid        []*cell
+	finishedMap []*cell
 	size        int
 	sizeWindows int
 	autoMode    bool
@@ -20,20 +21,22 @@ type Env struct {
 }
 
 type cell struct {
-	X       int
-	Y       int
-	cellImg image.Image
+	X         int
+	Y         int
+	cost      int
+	heuristic int
+	cellImg   image.Image
 }
 
 func main() {
-	env := Env{autoMode: false}
+	env := Env{}
 	err := env.parseFile()
 	if err != nil {
 		log.Fatal(err)
 	}
 	//Find the perfect size for the windows
 	if env.size == 0 {
-		log.Fatal("Error in input maps")
+		log.Fatal("error missing size value")
 	}
 	env.sizeWindows = 300 + (300 % env.size)
 	// Default images
@@ -41,9 +44,10 @@ func main() {
 		env.imgFile = "images/default.png"
 	}
 	env.cropImage(env.imgFile)
+	//start Algo
+	go env.botPlayer()
 	//go env.getKey()
 	if err := ebiten.Run(env.update, env.sizeWindows, env.sizeWindows, 2, "N-Puzzle"); err != nil {
 		log.Fatal(err)
 	}
-	//TODO start Algo
 }
