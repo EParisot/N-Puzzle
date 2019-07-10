@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"math"
+	"sort"
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
@@ -21,9 +23,42 @@ func (env *Env) botPlayer() {
 }
 
 func (env *Env) algo() {
-
+	env.buildFinished()
+	//print(env.globalManDist())
 }
 
-func (env *Env) astar() {
+func (env *Env) aStar() {
+	var closedList []*cell
+	var openList []*cell
+	// Append start node
+	openList = append(openList, &cell{})
+	for len(openList) != 0 {
+		// Sort slice
+		sort.Slice(openList, func(i, j int) bool {
+			return openList[i].heuristic < openList[j].heuristic
+		})
+		// Unstack first
+		currNode := openList[0]
+		openList[0] = nil
+		openList = openList[1:]
+		// Check end
+		if env.isFinished() {
+			closedList = append(closedList, currNode)
+			return
+		}
+		// Eval possible moves
+	}
+}
 
+func manhattanDistance(a, b *cell) int {
+	return int(math.Abs(float64(a.X)-float64(b.X)) +
+		math.Abs(float64(a.Y)-float64(b.Y)))
+}
+
+func (env *Env) globalManDist() int {
+	gManDist := 0
+	for id := 0; id < len(env.grid); id++ {
+		gManDist += manhattanDistance(env.grid[id], env.finishedMap[id])
+	}
+	return gManDist
 }
