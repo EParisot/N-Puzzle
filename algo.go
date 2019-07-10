@@ -24,7 +24,6 @@ func (env *Env) botPlayer() {
 
 func (env *Env) algo() {
 	env.buildFinished()
-	//print(env.globalManDist())
 	env.aStar()
 }
 
@@ -33,7 +32,7 @@ func (env *Env) aStar() {
 	var openList []*grid
 	// Append start node to open list
 	env.grid.cost = 0
-	env.grid.heuristic = env.globalManDist(env.grid)
+	env.grid.heuristic = env.globalHeuristic(env.grid)
 	openList = append(openList, env.grid)
 	lastPos := make([]int, 2)
 
@@ -46,10 +45,10 @@ func (env *Env) aStar() {
 		currGrid := openList[0]
 		openList = openList[:0]
 
-		env.grid = currGrid
+		env.grid = copyGrid(currGrid)
 		//DEBUG
-		/*fmt.Println(currGrid.mapping[0].X, ", ", currGrid.mapping[0].Y, currGrid.cost, "; ", currGrid.heuristic)
-		for {
+		fmt.Println(currGrid.mapping[0].X, ", ", currGrid.mapping[0].Y, currGrid.cost, "; ", currGrid.heuristic)
+		/*for {
 			time.Sleep(time.Second)
 			if ebiten.IsKeyPressed(ebiten.KeyControl) {
 				break
@@ -65,9 +64,8 @@ func (env *Env) aStar() {
 		movesList := env.getMoves(currGrid, lastPos)
 		for _, newGrid := range movesList {
 			//	if already present in closedList
-			i := isPresentID(newGrid, closedList)
+			/*i := isPresentID(newGrid, closedList)
 			if i >= 0 {
-				//fmt.Println("present in closed")
 				continue
 			}
 			//	elif already present in openList
@@ -79,7 +77,7 @@ func (env *Env) aStar() {
 					openList[i] = newGrid
 					continue
 				}
-			}
+			}*/
 			//	append move to openList
 			openList = append(openList, newGrid)
 		}
@@ -105,15 +103,16 @@ func isPresentID(currGrid *grid, gridList []*grid) int {
 func (env *Env) getMoves(currGrid *grid, lastPos []int) []*grid {
 	var gridList []*grid
 	for direction := 1; direction < 5; direction++ {
-		if env.checkMove(currGrid, direction) >= 0 {
-			//DEBUG
+		i := env.checkMove(currGrid, direction)
+		if i >= 0 {
+
 			/*fmt.Println(direction)
 			for i := 0; i < len(currGrid.mapping); i++ {
 				print(currGrid.mapping[i].X, ", ", currGrid.mapping[i].Y, "; ", currGrid.cost, ", ", currGrid.heuristic)
 			}
 			print("\n")*/
 
-			newGrid := env.virtualMove(currGrid, direction)
+			newGrid := env.virtualMove(currGrid, direction, i)
 
 			/*for i := 0; i < len(newGrid.mapping); i++ {
 				print(newGrid.mapping[i].X, ", ", newGrid.mapping[i].Y, "; ", newGrid.cost, ", ", newGrid.heuristic)
@@ -129,9 +128,8 @@ func (env *Env) getMoves(currGrid *grid, lastPos []int) []*grid {
 	return gridList
 }
 
-func (env *Env) virtualMove(currGrid *grid, direction int) *grid {
+func (env *Env) virtualMove(currGrid *grid, direction int, i int) *grid {
 	newGrid := copyGrid(currGrid)
-	i := env.checkMove(newGrid, direction)
 	if i >= 0 {
 		switch {
 		case direction == UP:
@@ -148,7 +146,7 @@ func (env *Env) virtualMove(currGrid *grid, direction int) *grid {
 			newGrid.mapping[i].X++
 		}
 		newGrid.cost = newGrid.cost + 1
-		newGrid.heuristic = newGrid.cost + env.globalManDist(newGrid)
+		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)
 	}
 	return newGrid
 }
@@ -168,15 +166,29 @@ func copyGrid(srcGrid *grid) *grid {
 	return newGrid
 }
 
+func (env *Env) globalHeuristic(currGrid *grid) int {
+	gManDist := 0
+	for id := 0; id < len(currGrid.mapping); id++ {
+		switch {
+		case env.heuristic == "" || env.heuristic == "md":
+			gManDist += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
+		case env.heuristic == "c":
+			gManDist += countLeft(currGrid.mapping[id], env.finishedMap.mapping[id])
+		}
+	}
+	return gManDist
+}
+
+// Heuristics :
+
 func manhattanDistance(a, b *cell) int {
 	return int(math.Abs(float64(a.X)-float64(b.X)) +
 		math.Abs(float64(a.Y)-float64(b.Y)))
 }
 
-func (env *Env) globalManDist(currGrid *grid) int {
-	gManDist := 0
-	for id := 0; id < len(currGrid.mapping); id++ {
-		gManDist += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
+func countLeft(a, b *cell) int {
+	if a.X != b.X || a.Y != b.Y {
+		return 1
 	}
-	return gManDist
+	return 0
 }
