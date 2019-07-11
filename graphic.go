@@ -31,8 +31,9 @@ func (env *Env) update(screen *ebiten.Image) error {
 	//Fill the screen with background color
 	screen.Fill(color.NRGBA{0xff, 0x00, 0x00, 0xff})
 	//Handle controls
-	env.getKey()
-
+	if !env.isFinished() {
+		env.getKey()
+	}
 	for i := range env.grid.mapping {
 		//Add cells
 		env.addSquare(float64(env.grid.mapping[i].X*(env.sizeWindows/env.size)),
@@ -55,8 +56,6 @@ func (env *Env) getKey() {
 		env.moveCell(env.grid, LEFT)
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
 		env.moveCell(env.grid, RIGHT)
-	} else if env.isFinished() {
-		return
 	}
 }
 

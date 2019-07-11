@@ -57,7 +57,7 @@ func (env *Env) isFinished() bool {
 	if len(env.finishedMap.mapping) == 0 {
 		env.buildFinished()
 	}
-	for id := 1; id < env.size; id++ {
+	for id := 1; id < env.size*env.size; id++ {
 		if env.grid.mapping[id].X != env.finishedMap.mapping[id].X || env.grid.mapping[id].Y != env.finishedMap.mapping[id].Y {
 			return false
 		}
