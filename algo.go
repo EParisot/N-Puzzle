@@ -30,6 +30,9 @@ func (env *Env) algo() {
 func (env *Env) aStar() {
 	var closedList []*grid
 	var openList []*grid
+	var antiBoucle []*grid
+	var i int
+	i = 0
 	// Append start node to open list
 	env.grid.cost = 0
 	env.grid.heuristic = env.globalHeuristic(env.grid)
@@ -38,27 +41,68 @@ func (env *Env) aStar() {
 		// Unstack first cell of open list
 		currGrid := openList[0]
 		env.grid = copyGrid(currGrid)
+		//fmt.Println("Initial Grid :")
+		//env.printGrid(env.grid)
+		//if i == 2 {
+		//	fmt.Println("Open list : ")
+		//	for move := 0; move < len(openList); move++ {
+		//		env.printGrid(openList[move])
+		//	}
+		//	log.Fatal("Error new images")
+		//}
 		// Check end
 		if env.isFinished() {
 			closedList = append(closedList, currGrid)
-			fmt.Println("aStar done")
+			fmt.Println(len(closedList))
 			return
 		}
 		//for each possible move
 		movesList := env.getMoves(currGrid)
+
+		//for move := 0; move < len(movesList); move++ {
+		//	fmt.Println("Possible Move :")
+		//	env.printGrid(movesList[move])
+		//}
+		var j int
+		j = 0
 		for _, newGrid := range movesList {
-			openList = append(openList, newGrid)
+			if !env.havedouble(newGrid, antiBoucle) {
+				openList = append(openList, newGrid)
+				antiBoucle = append(antiBoucle, newGrid)
+			}
+			j++
 		}
-		//append currGrid to closedList
-		closedList = append(closedList, currGrid)
+		if len(movesList) == j {
+			//append currGrid to closedList
+			closedList = append(closedList, currGrid)
+		}
 		// pop currGrid from openList
 		openList = openList[1:]
 		// sort openList
 		sort.Slice(openList, func(i, j int) bool {
 			return openList[i].heuristic < openList[j].heuristic
 		})
+		i++
 	}
 	fmt.Println("aStar returned no solution")
+}
+
+func Equal(a, b []*cell) bool {
+	for i := 0; i < len(a); i++ {
+		if a[i].X != b[i].X || a[i].Y != b[i].Y {
+			return false
+		}
+	}
+	return true
+}
+
+func (env *Env) havedouble(gridToCheck *grid, openList []*grid) bool {
+	for i := 0; i < len(openList); i++ {
+		if Equal(gridToCheck.mapping, openList[i].mapping) {
+			return true
+		}
+	}
+	return false
 }
 
 func isPresentID(currGrid *grid, gridList []*grid) int {

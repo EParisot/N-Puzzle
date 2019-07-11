@@ -55,7 +55,7 @@ func main() {
 	env.cropImage(env.imgFile)
 	//start Algo
 	go env.botPlayer()
-	//go env.getKey()
+	go env.getKey()
 	if err := ebiten.Run(env.update, env.sizeWindows, env.sizeWindows, 2, "N-Puzzle"); err != nil {
 		log.Fatal(err)
 	}

@@ -75,8 +75,8 @@ func (env *Env) printGrid(grid *grid) {
 
 		for x := 0; x < env.size; x++ {
 
-			for i := 0; i < len(env.grid.mapping); i++ {
-				if env.grid.mapping[i].X == x && env.grid.mapping[i].Y == y {
+			for i := 0; i < len(grid.mapping); i++ {
+				if grid.mapping[i].X == x && grid.mapping[i].Y == y {
 					fmt.Print(i)
 					break
 				}
@@ -85,4 +85,5 @@ func (env *Env) printGrid(grid *grid) {
 		}
 		fmt.Print("\n")
 	}
+	fmt.Println()
 }
