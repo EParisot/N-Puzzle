@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 func (env *Env) isPresent(idToTest int) bool {
 	for id, cell := range env.grid.mapping {
 		if id == idToTest && cell != nil {
@@ -63,4 +67,22 @@ func (env *Env) isFinished() bool {
 		}
 	}
 	return true
+}
+
+func (env *Env) printGrid(grid *grid) {
+
+	for y := 0; y < env.size; y++ {
+
+		for x := 0; x < env.size; x++ {
+
+			for i := 0; i < len(env.grid.mapping); i++ {
+				if env.grid.mapping[i].X == x && env.grid.mapping[i].Y == y {
+					fmt.Print(i)
+					break
+				}
+			}
+			fmt.Print(" ")
+		}
+		fmt.Print("\n")
+	}
 }
