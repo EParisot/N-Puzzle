@@ -43,13 +43,6 @@ func (env *Env) aStar() {
 		env.grid = copyGrid(currGrid)
 		//fmt.Println("Initial Grid :")
 		//env.printGrid(env.grid)
-		//if i == 2 {
-		//	fmt.Println("Open list : ")
-		//	for move := 0; move < len(openList); move++ {
-		//		env.printGrid(openList[move])
-		//	}
-		//	log.Fatal("Error new images")
-		//}
 		// Check end
 		if env.isFinished() {
 			closedList = append(closedList, currGrid)
@@ -69,10 +62,10 @@ func (env *Env) aStar() {
 			if !env.havedouble(newGrid, antiBoucle) {
 				openList = append(openList, newGrid)
 				antiBoucle = append(antiBoucle, newGrid)
+				j++
 			}
-			j++
 		}
-		if len(movesList) == j {
+		if j != 0 {
 			//append currGrid to closedList
 			closedList = append(closedList, currGrid)
 		}
