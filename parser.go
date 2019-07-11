@@ -87,7 +87,7 @@ func (env *Env) readSize(reader *bufio.Reader) error {
 }
 
 func (env *Env) readMap(reader *bufio.Reader) error {
-	env.grid = make([]*cell, env.size*env.size)
+	env.grid.mapping = make([]*cell, env.size*env.size)
 	for j := 0; j < env.size; j++ {
 		line, err := parseLine(reader)
 		if err != nil {
@@ -105,11 +105,14 @@ func (env *Env) readMap(reader *bufio.Reader) error {
 			if env.isPresent(valInt) {
 				return errors.New("error duplicated cell id")
 			}
-			env.grid[valInt] = &cell{
+			env.grid.mapping[valInt] = &cell{
 				X: i,
 				Y: j,
 			}
 		}
+	}
+	if env.checkSolvability() == false {
+		return errors.New("error unsolvable map")
 	}
 	return nil
 }
