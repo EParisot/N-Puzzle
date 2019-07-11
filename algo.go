@@ -115,6 +115,7 @@ func copyGrid(srcGrid *grid) *grid {
 		newCell.X = srcGrid.mapping[i].X
 		newCell.Y = srcGrid.mapping[i].Y
 		newCell.cellImg = srcGrid.mapping[i].cellImg
+		newCell.digitImg = srcGrid.mapping[i].digitImg
 		newGrid.mapping[i] = &newCell
 	}
 	newGrid.cost = srcGrid.cost
