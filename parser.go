@@ -116,7 +116,7 @@ func (env *Env) readMap(reader *bufio.Reader) error {
 			}
 		}
 	}
-	if env.checkSolvability() == false {
+	if env.isFinished() == false && env.checkSolvability() == false {
 		return errors.New("error unsolvable map")
 	}
 	return nil
