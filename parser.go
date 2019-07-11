@@ -56,12 +56,15 @@ func (env *Env) parseArgs() error {
 			env.mapFile = os.Args[i+1]
 		} else if arg == "-i" && i+1 < len(os.Args) &&
 			strings.HasSuffix(os.Args[i+1], ".png") {
+			fmt.Println("Here")
 			env.imgFile = os.Args[i+1]
 		} else if arg == "-d" && i+1 < len(os.Args) {
 			env.difficulty = os.Args[i+1]
 		} else if arg == "-a" && i+1 < len(os.Args) {
 			env.autoMode = true
 			env.heuristic = os.Args[i+1]
+		} else if arg == "-dg" {
+			env.digit = true
 		}
 	}
 	if env.mapFile == "" {
@@ -79,7 +82,7 @@ func (env *Env) readSize(reader *bufio.Reader) error {
 		return errors.New("error missing size value")
 	}
 	size, err := strconv.Atoi(firstLine)
-	if err != nil || size < 3 {
+	if err != nil || size < 3 || size > 31 {
 		return errors.New("error invalid size value")
 	}
 	env.size = size

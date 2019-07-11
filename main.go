@@ -18,6 +18,7 @@ type Env struct {
 	sizeWindows int
 	autoMode    bool
 	heuristic   string
+	digit       bool
 }
 
 type grid struct {
@@ -27,9 +28,10 @@ type grid struct {
 }
 
 type cell struct {
-	X       int
-	Y       int
-	cellImg image.Image
+	X        int
+	Y        int
+	cellImg  image.Image
+	digitImg image.Image
 }
 
 func main() {
