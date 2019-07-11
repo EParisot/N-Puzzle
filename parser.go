@@ -42,7 +42,9 @@ func printUsage() {
 			-m map        = 'map_file.map'
 			-i image      = 'image_file.png'
 			-d difficulty = 'E[asy]', 'M[edium]', 'H[ard]'
-			-a heuristic  = 'heuristic' (default 'manhattan distance')`)
+			-a heuristic  = 'heuristic' (default 'manhattan distance')
+			-dg (Add numbers to the picture)
+			`)
 }
 
 func (env *Env) parseArgs() error {
