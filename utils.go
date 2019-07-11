@@ -1,7 +1,7 @@
 package main
 
 func (env *Env) isPresent(idToTest int) bool {
-	for id, cell := range env.grid {
+	for id, cell := range env.grid.mapping {
 		if id == idToTest && cell != nil {
 			return true
 		}
@@ -16,8 +16,8 @@ func (env *Env) buildFinished() {
 	countCell := 0
 	offset := 0
 	way := 0
-	finished := make([]*cell, len(env.grid))
-	for id := 1; id < len(env.grid); id++ {
+	finished := make([]*cell, len(env.grid.mapping))
+	for id := 1; id < len(env.grid.mapping); id++ {
 		finished[id] = &cell{}
 		finished[id].X = x
 		finished[id].Y = y
@@ -50,15 +50,15 @@ func (env *Env) buildFinished() {
 	finished[0] = &cell{}
 	finished[0].X = x
 	finished[0].Y = y
-	env.finishedMap = finished
+	env.finishedMap.mapping = finished
 }
 
 func (env *Env) isFinished() bool {
-	if len(env.finishedMap) == 0 {
+	if len(env.finishedMap.mapping) == 0 {
 		env.buildFinished()
 	}
-	for id := 1; id < env.size; id++ {
-		if env.grid[id].X != env.finishedMap[id].X || env.grid[id].Y != env.finishedMap[id].Y {
+	for id := 1; id < env.size*env.size; id++ {
+		if env.grid.mapping[id].X != env.finishedMap.mapping[id].X || env.grid.mapping[id].Y != env.finishedMap.mapping[id].Y {
 			return false
 		}
 	}
