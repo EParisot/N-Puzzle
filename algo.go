@@ -164,8 +164,8 @@ func (env *Env) globalHeuristic(currGrid *Grid) int {
 			switch {
 			case env.heuristic == "" || env.heuristic == "md":
 				gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
-			case env.heuristic == "c":
-				gHeur += countLeft(currGrid.mapping[id], env.finishedMap.mapping[id])
+			case env.heuristic == "hd":
+				gHeur += hammingDistance(currGrid.mapping[id], env.finishedMap.mapping[id], id)
 			}
 		}
 	}
@@ -179,8 +179,8 @@ func manhattanDistance(a, b *cell) int {
 		math.Abs(float64(a.Y)-float64(b.Y)))
 }
 
-func countLeft(a, b *cell) int {
-	if a.X != b.X || a.Y != b.Y {
+func hammingDistance(a, b *cell, id int) int {
+	if id != 0 && (a.X != b.X || a.Y != b.Y) {
 		return 1
 	}
 	return 0
@@ -204,10 +204,12 @@ func (env *Env) countInversions() int {
 			k := idxByVAL(finishedList, currList[pivot])
 			// for each next id in curr
 			for i := range currList[pivot+1:] {
-				// check if next val in curr < pos pivot in res
-				j := idxByVAL(finishedList, currList[pivot+i])
-				if j < k {
-					inversions++
+				if currList[pivot+1+i] != 0 {
+					// check if next val in curr < pos pivot in res
+					j := idxByVAL(finishedList, currList[pivot+1+i])
+					if j < k {
+						inversions++
+					}
 				}
 			}
 		}

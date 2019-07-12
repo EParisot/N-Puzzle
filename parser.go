@@ -41,8 +41,8 @@ func printUsage() {
 	fmt.Println(`Usage : N-Puzzle map_file [-m map] [-i image] [-d difficulty] [-a heuristic]
 			-m map        = 'map_file.map'
 			-i image      = 'image_file.png'
-			-s size       = 'map size (int)'
-			-h heuristic  = 'heuristic' (default 'manhattan distance')
+			-s size       = map size (int)
+			-h heuristic  = 'heuristic' ('md' (default), 'hd', 'i')
 			-dg (Add numbers to the picture)
 			`)
 }
@@ -67,7 +67,7 @@ func (env *Env) parseArgs() error {
 			}
 			env.size = size
 		} else if arg == "-h" && i+1 < len(os.Args) {
-			if os.Args[i+1] != "md" && os.Args[i+1] != "c" && os.Args[i+1] != "i" {
+			if os.Args[i+1] != "md" && os.Args[i+1] != "hd" && os.Args[i+1] != "i" {
 				return errors.New("error invalid heuristic value")
 			}
 			env.heuristic = os.Args[i+1]
@@ -122,18 +122,22 @@ func (env *Env) readMap(reader *bufio.Reader) error {
 			}
 		}
 	}
-	if env.isFinished() == false && env.checkSolvability() == false {
+	if env.isFinished() == false && env.checkSolvability(env.grid) == false {
 		return errors.New("error unsolvable map")
 	}
 	return nil
 }
 
 func parseLine(reader *bufio.Reader) (string, error) {
-	line, _, err := reader.ReadLine()
-	if err != nil {
-		return "", errors.New("error reading map file")
+	var lineStr string
+	for len(lineStr) == 0 {
+		line, _, err := reader.ReadLine()
+		if err != nil {
+			return "", errors.New("error reading map file")
+		}
+		lineStr = string(line)
+		lineTab := strings.Split(lineStr, "#")
+		lineStr = lineTab[0]
 	}
-	lineStr := string(line)
-	lineTab := strings.Split(lineStr, "#")
-	return lineTab[0], nil
+	return lineStr, nil
 }

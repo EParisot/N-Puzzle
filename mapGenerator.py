@@ -94,5 +94,5 @@ if __name__ == "__main__":
 	print("%d" % s)
 	for y in range(s):
 		for x in range(s):
-			print("%s" % (str(puzzle[x + y*s]).rjust(w))),
+			print("%s" % (str(puzzle[x + y*s]).rjust(w)), end = ' '),
 		print()
