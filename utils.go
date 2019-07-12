@@ -57,6 +57,7 @@ func (env *Env) buildFinished() {
 	env.finishedMap.mapping = finished
 }
 
+// if grid is nil, eval the env.grid
 func (env *Env) isFinished(grid *Grid) bool {
 	if grid == nil {
 		grid = env.grid
