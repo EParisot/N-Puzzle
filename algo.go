@@ -30,39 +30,43 @@ func (env *Env) algo() {
 
 func (env *Env) idAstar() {
 	threshold := env.globalHeuristic(env.grid)
+	best := env.grid
 	for {
-		tmpThres := env.search(env.grid, threshold)
+		tmpThres, best := env.search(best, threshold)
 		if tmpThres == -1 {
+			env.grid = best
 			fmt.Println("IDAstar Done")
 			return
 		} else if tmpThres >= 10000 {
 			fmt.Println("IDAstar returned no solution")
 			return
 		}
+		env.grid = best
 		threshold = tmpThres
 	}
 }
 
-func (env *Env) search(currGrid *Grid, threshold int) int {
+func (env *Env) search(currGrid *Grid, threshold int) (int, *Grid) {
 	if currGrid.heuristic > threshold {
-		return currGrid.heuristic
+		return currGrid.heuristic, currGrid
 	}
 	if env.isFinished(currGrid) {
-		return -1
+		return -1, currGrid
 	}
 	min := 10000
 	childsList := env.getMoves(currGrid)
-	var child *Grid
-	for _, child = range childsList {
-		tmp := env.search(child, threshold)
+	var best *Grid
+	for _, child := range childsList {
+		tmp, child := env.search(child, threshold)
 		if tmp == -1 {
-			return -1
+			return -1, child
 		}
-		if tmp < min {
+		if tmp <= min {
 			min = tmp
+			best = child
 		}
 	}
-	return min
+	return min, best
 }
 
 func (env *Env) aStar() {
