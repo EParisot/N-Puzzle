@@ -67,7 +67,7 @@ func (env *Env) parseArgs() error {
 			}
 			env.size = size
 		} else if arg == "-h" && i+1 < len(os.Args) {
-			if os.Args[i+1] != "md" && os.Args[i+1] != "hd" && os.Args[i+1] != "i" {
+			if os.Args[i+1] != "md" && os.Args[i+1] != "hd" && os.Args[i+1] != "lc" {
 				return errors.New("error invalid heuristic value")
 			}
 			env.heuristic = os.Args[i+1]

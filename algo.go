@@ -157,24 +157,27 @@ func CopyGrid(srcGrid *Grid) *Grid {
 
 func (env *Env) globalHeuristic(currGrid *Grid) int {
 	gHeur := 0
-	if env.heuristic == "i" {
-		gHeur = env.countInversions()
-	} else {
-		for id := 0; id < len(currGrid.mapping); id++ {
-			switch {
-			case env.heuristic == "" || env.heuristic == "md":
-				gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
-			case env.heuristic == "hd":
-				gHeur += hammingDistance(currGrid.mapping[id], env.finishedMap.mapping[id], id)
-			}
+
+	for id := 0; id < len(currGrid.mapping); id++ {
+		switch {
+		case env.heuristic == "" || env.heuristic == "md":
+			gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id], id)
+		case env.heuristic == "hd":
+			gHeur += hammingDistance(currGrid.mapping[id], env.finishedMap.mapping[id], id)
+		case env.heuristic == "lc":
+			gHeur += linearConflicts(currGrid, currGrid.mapping[id], env.finishedMap.mapping[id], id)
 		}
+
 	}
 	return gHeur
 }
 
 // Heuristics :
 
-func manhattanDistance(a, b *cell) int {
+func manhattanDistance(a, b *cell, id int) int {
+	if id == 0 {
+		return 0
+	}
 	return int(math.Abs(float64(a.X)-float64(b.X)) +
 		math.Abs(float64(a.Y)-float64(b.Y)))
 }
@@ -186,33 +189,17 @@ func hammingDistance(a, b *cell, id int) int {
 	return 0
 }
 
-func (env *Env) countInversions() int {
-	var currList []int
-	var finishedList []int
-	finishedMap := env.finishedMap
-	for y := 0; y < env.size; y++ {
-		for x := 0; x < env.size; x++ {
-			currList = append(currList, idxByXY(env.grid, x, y))
-			finishedList = append(finishedList, idxByXY(finishedMap, x, y))
-		}
+func linearConflicts(currGrid *Grid, a, b *cell, id int) int {
+	if id == 0 {
+		return 0
 	}
-	// iter on ids to count inversions
-	inversions := 0
-	for pivot := range currList {
-		if currList[pivot] != 0 {
-			// find pivot in result
-			k := idxByVAL(finishedList, currList[pivot])
-			// for each next id in curr
-			for i := range currList[pivot+1:] {
-				if currList[pivot+1+i] != 0 {
-					// check if next val in curr < pos pivot in res
-					j := idxByVAL(finishedList, currList[pivot+1+i])
-					if j < k {
-						inversions++
-					}
-				}
-			}
-		}
+	md := manhattanDistance(a, b, id)
+	lc := 0
+	if (((a.X == b.X+1 && IdxByXY(currGrid, a.X+1, a.Y) != 0) ||
+		(a.X == b.X-1 && IdxByXY(currGrid, a.X-1, a.Y) != 0)) && a.Y == b.Y) ||
+		(((a.Y == b.Y+1 && IdxByXY(currGrid, a.X, a.Y+1) != 0) ||
+			(a.Y == b.Y-1 && IdxByXY(currGrid, a.X, a.Y-1) != 0)) && a.X == b.X) {
+		lc++
 	}
-	return inversions
+	return (2 * lc) + md
 }

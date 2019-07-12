@@ -53,6 +53,37 @@ func (env *Env) checkSolvability(grid *Grid) bool {
 	return true
 }
 
+func (env *Env) countInversions() int {
+	var currList []int
+	var finishedList []int
+	finishedMap := env.finishedMap
+	for y := 0; y < env.size; y++ {
+		for x := 0; x < env.size; x++ {
+			currList = append(currList, IdxByXY(env.grid, x, y))
+			finishedList = append(finishedList, IdxByXY(finishedMap, x, y))
+		}
+	}
+	// iter on ids to count inversions
+	inversions := 0
+	for pivot := range currList {
+		if currList[pivot] != 0 {
+			// find pivot in result
+			k := idxByVAL(finishedList, currList[pivot])
+			// for each next id in curr
+			for i := range currList[pivot+1:] {
+				if currList[pivot+1+i] != 0 {
+					// check if next val in curr < pos pivot in res
+					j := idxByVAL(finishedList, currList[pivot+1+i])
+					if j < k {
+						inversions++
+					}
+				}
+			}
+		}
+	}
+	return inversions
+}
+
 func idxByVAL(list []int, val int) int {
 	i := 0
 	for i = range list {
@@ -63,7 +94,7 @@ func idxByVAL(list []int, val int) int {
 	return i
 }
 
-func idxByXY(grid *Grid, x, y int) int {
+func IdxByXY(grid *Grid, x, y int) int {
 	i := 0
 	for i = range grid.mapping {
 		if grid.mapping[i].X == x && grid.mapping[i].Y == y {
