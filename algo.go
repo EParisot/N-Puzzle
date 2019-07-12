@@ -156,14 +156,16 @@ func CopyGrid(srcGrid *Grid) *Grid {
 
 func (env *Env) globalHeuristic(currGrid *Grid) int {
 	gHeur := 0
-	for id := 0; id < len(currGrid.mapping); id++ {
-		switch {
-		case env.heuristic == "" || env.heuristic == "md":
-			gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
-		case env.heuristic == "c":
-			gHeur += countLeft(currGrid.mapping[id], env.finishedMap.mapping[id])
-		case env.heuristic == "i":
-			gHeur += env.countInversions()
+	if env.heuristic == "i" {
+		gHeur = env.countInversions()
+	} else {
+		for id := 0; id < len(currGrid.mapping); id++ {
+			switch {
+			case env.heuristic == "" || env.heuristic == "md":
+				gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
+			case env.heuristic == "c":
+				gHeur += countLeft(currGrid.mapping[id], env.finishedMap.mapping[id])
+			}
 		}
 	}
 	return gHeur
