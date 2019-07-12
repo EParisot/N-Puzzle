@@ -195,10 +195,7 @@ func linearConflicts(currGrid *Grid, a, b *cell, id int) int {
 	}
 	md := manhattanDistance(a, b, id)
 	lc := 0
-	if (((a.X == b.X+1 && IdxByXY(currGrid, a.X+1, a.Y) != 0) ||
-		(a.X == b.X-1 && IdxByXY(currGrid, a.X-1, a.Y) != 0)) && a.Y == b.Y) ||
-		(((a.Y == b.Y+1 && IdxByXY(currGrid, a.X, a.Y+1) != 0) ||
-			(a.Y == b.Y-1 && IdxByXY(currGrid, a.X, a.Y-1) != 0)) && a.X == b.X) {
+	if (a.X == b.X && a.Y != b.Y) || (a.X != b.X && a.Y == b.Y) {
 		lc++
 	}
 	return (2 * lc) + md
