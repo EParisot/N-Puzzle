@@ -24,7 +24,45 @@ func (env *Env) botPlayer() {
 
 func (env *Env) algo() {
 	env.buildFinished()
-	env.aStar()
+	//env.aStar()
+	env.idAstar()
+}
+
+func (env *Env) idAstar() {
+	threshold := env.globalHeuristic(env.grid)
+	for {
+		tmpThres := env.search(env.grid, threshold)
+		if tmpThres == -1 {
+			fmt.Println("IDAstar Done")
+			return
+		} else if tmpThres >= 10000 {
+			fmt.Println("IDAstar returned no solution")
+			return
+		}
+		threshold = tmpThres
+	}
+}
+
+func (env *Env) search(currGrid *Grid, threshold int) int {
+	if currGrid.heuristic > threshold {
+		return currGrid.heuristic
+	}
+	if env.isFinished(currGrid) {
+		return -1
+	}
+	min := 10000
+	childsList := env.getMoves(currGrid)
+	var child *Grid
+	for _, child = range childsList {
+		tmp := env.search(child, threshold)
+		if tmp == -1 {
+			return -1
+		}
+		if tmp < min {
+			min = tmp
+		}
+	}
+	return min
 }
 
 func (env *Env) aStar() {
@@ -42,7 +80,7 @@ func (env *Env) aStar() {
 		currGrid := openList[0]
 		env.grid = CopyGrid(currGrid)
 		// Check end
-		if env.isFinished() {
+		if env.isFinished(nil) {
 			closedList = append(closedList, currGrid)
 			fmt.Println(len(closedList))
 			return
