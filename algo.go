@@ -28,9 +28,9 @@ func (env *Env) algo() {
 }
 
 func (env *Env) aStar() {
-	var closedList []*grid
-	var openList []*grid
-	var antiBoucle []*grid
+	var closedList []*Grid
+	var openList []*Grid
+	var antiBoucle []*Grid
 	var i int
 	i = 0
 	// Append start node to open list
@@ -40,7 +40,7 @@ func (env *Env) aStar() {
 	for len(openList) != 0 {
 		// Unstack first cell of open list
 		currGrid := openList[0]
-		env.grid = copyGrid(currGrid)
+		env.grid = CopyGrid(currGrid)
 		//fmt.Println("Initial Grid :")
 		//env.printGrid(env.grid)
 		// Check end
@@ -80,6 +80,7 @@ func (env *Env) aStar() {
 	fmt.Println("aStar returned no solution")
 }
 
+// Equal check if two cells are equal
 func Equal(a, b []*cell) bool {
 	for i := 0; i < len(a); i++ {
 		if a[i].X != b[i].X || a[i].Y != b[i].Y {
@@ -89,7 +90,7 @@ func Equal(a, b []*cell) bool {
 	return true
 }
 
-func (env *Env) havedouble(gridToCheck *grid, openList []*grid) bool {
+func (env *Env) havedouble(gridToCheck *Grid, openList []*Grid) bool {
 	for i := 0; i < len(openList); i++ {
 		if Equal(gridToCheck.mapping, openList[i].mapping) {
 			return true
@@ -98,7 +99,7 @@ func (env *Env) havedouble(gridToCheck *grid, openList []*grid) bool {
 	return false
 }
 
-func isPresentID(currGrid *grid, gridList []*grid) int {
+func isPresentID(currGrid *Grid, gridList []*Grid) int {
 	for i, grid := range gridList {
 		for cell := 0; cell < len(currGrid.mapping); cell++ {
 			if grid.mapping[cell] == currGrid.mapping[cell] {
@@ -109,8 +110,8 @@ func isPresentID(currGrid *grid, gridList []*grid) int {
 	return -1
 }
 
-func (env *Env) getMoves(currGrid *grid) []*grid {
-	var gridList []*grid
+func (env *Env) getMoves(currGrid *Grid) []*Grid {
+	var gridList []*Grid
 	for direction := 1; direction < 5; direction++ {
 		i := env.checkMove(currGrid, direction)
 		if i >= 0 {
@@ -121,8 +122,8 @@ func (env *Env) getMoves(currGrid *grid) []*grid {
 	return gridList
 }
 
-func (env *Env) virtualMove(currGrid *grid, direction int, i int) *grid {
-	newGrid := copyGrid(currGrid)
+func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
+	newGrid := CopyGrid(currGrid)
 	if i >= 0 {
 		switch {
 		case direction == UP:
@@ -144,8 +145,9 @@ func (env *Env) virtualMove(currGrid *grid, direction int, i int) *grid {
 	return newGrid
 }
 
-func copyGrid(srcGrid *grid) *grid {
-	newGrid := &grid{}
+// CopyGrid copy a grid
+func CopyGrid(srcGrid *Grid) *Grid {
+	newGrid := &Grid{}
 	newGrid.mapping = make([]*cell, len(srcGrid.mapping))
 	for i := 0; i < len(srcGrid.mapping); i++ {
 		newCell := cell{}
@@ -160,7 +162,7 @@ func copyGrid(srcGrid *grid) *grid {
 	return newGrid
 }
 
-func (env *Env) globalHeuristic(currGrid *grid) int {
+func (env *Env) globalHeuristic(currGrid *Grid) int {
 	gManDist := 0
 	for id := 0; id < len(currGrid.mapping); id++ {
 		switch {

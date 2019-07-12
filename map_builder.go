@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 func (env *Env) buildMap() {
@@ -16,22 +17,20 @@ func (env *Env) buildMap() {
 	}
 	newMap := make([]*cell, env.size*env.size)
 	env.grid.mapping = newMap
-	r := rand.New(rand.NewSource(42)) //time.Now().UnixNano()))
-	newID := r.Intn(env.size * env.size)
+	env.buildFinished()
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	fmt.Println("Building map...")
 	for env.checkSolvability() == false {
-		for y := 0; y < env.size; y++ {
-			for x := 0; x < env.size; x++ {
-				for env.isPresent(newID) {
-					newID = r.Intn(env.size * env.size)
-				}
-				env.grid.mapping[newID] = &cell{
-					X: x,
-					Y: y,
-				}
-			}
+		env.grid = CopyGrid(env.finishedMap)
+		for i := 0; i < 10000; i++ {
+			env.shuffle(r)
 		}
 	}
+}
+
+func (env *Env) shuffle(r *rand.Rand) {
+	move := r.Intn(4) + 1
+	env.moveCell(env.grid, move)
 }
 
 func (env *Env) checkSolvability() bool {
@@ -40,7 +39,7 @@ func (env *Env) checkSolvability() bool {
 	}
 	var currList []int
 	var finishedList []int
-	env.buildFinished()
+
 	finishedMap := env.finishedMap
 	inversions := 0
 	for y := 0; y < env.size; y++ {
@@ -98,7 +97,7 @@ func idxByVAL(list []int, val int) int {
 	return i
 }
 
-func idxByXY(grid *grid, x, y int) int {
+func idxByXY(grid *Grid, x, y int) int {
 	i := 0
 	for i = range grid.mapping {
 		if grid.mapping[i].X == x && grid.mapping[i].Y == y {

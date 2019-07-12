@@ -12,8 +12,8 @@ type Env struct {
 	mapFile     string
 	imgFile     string
 	difficulty  string
-	grid        *grid
-	finishedMap *grid
+	grid        *Grid
+	finishedMap *Grid
 	size        int
 	sizeWindows int
 	autoMode    bool
@@ -21,7 +21,7 @@ type Env struct {
 	digit       bool
 }
 
-type grid struct {
+type Grid struct {
 	mapping   []*cell
 	cost      int
 	heuristic int
@@ -36,8 +36,8 @@ type cell struct {
 
 func main() {
 	env := Env{
-		grid:        &grid{},
-		finishedMap: &grid{},
+		grid:        &Grid{},
+		finishedMap: &Grid{},
 	}
 	err := env.parseFile()
 	if err != nil {

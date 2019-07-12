@@ -61,7 +61,7 @@ func (env *Env) getKey() {
 	}
 }
 
-func (env *Env) checkMove(currGrid *grid, move int) int {
+func (env *Env) checkMove(currGrid *Grid, move int) int {
 	if move == UP && currGrid.mapping[0].Y != env.size-1 {
 		for i := range currGrid.mapping {
 			if currGrid.mapping[i].X == currGrid.mapping[0].X && currGrid.mapping[i].Y == currGrid.mapping[0].Y+1 {
@@ -90,7 +90,7 @@ func (env *Env) checkMove(currGrid *grid, move int) int {
 	return -1
 }
 
-func (env *Env) moveCell(currGrid *grid, direction int) {
+func (env *Env) moveCell(currGrid *Grid, direction int) {
 	i := env.checkMove(currGrid, direction)
 	if i >= 0 {
 		switch {

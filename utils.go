@@ -69,7 +69,7 @@ func (env *Env) isFinished() bool {
 	return true
 }
 
-func (env *Env) printGrid(grid *grid) {
+func (env *Env) printGrid(grid *Grid) {
 
 	for y := 0; y < env.size; y++ {
 
