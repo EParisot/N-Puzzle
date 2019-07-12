@@ -11,7 +11,6 @@ import (
 type Env struct {
 	mapFile     string
 	imgFile     string
-	difficulty  string
 	grid        *Grid
 	finishedMap *Grid
 	size        int

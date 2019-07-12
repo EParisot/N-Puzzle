@@ -7,14 +7,6 @@ import (
 )
 
 func (env *Env) buildMap() {
-	switch {
-	case env.difficulty == "E" || env.difficulty == "Easy":
-		env.size = 3
-	case env.difficulty == "M" || env.difficulty == "Medium":
-		env.size = 8
-	case env.difficulty == "H" || env.difficulty == "Hard":
-		env.size = 16
-	}
 	newMap := make([]*cell, env.size*env.size)
 	env.grid.mapping = newMap
 	env.buildFinished()

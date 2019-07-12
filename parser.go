@@ -41,7 +41,7 @@ func printUsage() {
 	fmt.Println(`Usage : N-Puzzle map_file [-m map] [-i image] [-d difficulty] [-a heuristic]
 			-m map        = 'map_file.map'
 			-i image      = 'image_file.png'
-			-d difficulty = 'E[asy]', 'M[edium]', 'H[ard]'
+			-s size       = 'map size (int)'
 			-a heuristic  = 'heuristic' (default 'manhattan distance')
 			-dg (Add numbers to the picture)
 			`)
@@ -60,8 +60,12 @@ func (env *Env) parseArgs() error {
 			strings.HasSuffix(os.Args[i+1], ".png") {
 			fmt.Println("Here")
 			env.imgFile = os.Args[i+1]
-		} else if arg == "-d" && i+1 < len(os.Args) {
-			env.difficulty = os.Args[i+1]
+		} else if arg == "-s" && i+1 < len(os.Args) {
+			size, err := strconv.Atoi(os.Args[i+1])
+			if err != nil || size < 2 || size > 31 {
+				return errors.New("error invalid size value")
+			}
+			env.size = size
 		} else if arg == "-a" && i+1 < len(os.Args) {
 			env.autoMode = true
 			env.heuristic = os.Args[i+1]
@@ -70,7 +74,7 @@ func (env *Env) parseArgs() error {
 		}
 	}
 	if env.mapFile == "" {
-		if env.difficulty != "" {
+		if env.size >= 2 {
 			env.buildMap()
 		}
 	}
