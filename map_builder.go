@@ -29,32 +29,7 @@ func (env *Env) checkSolvability() bool {
 	if env.grid.mapping[0] == nil {
 		return false
 	}
-	var currList []int
-	var finishedList []int
-
-	finishedMap := env.finishedMap
-	inversions := 0
-	for y := 0; y < env.size; y++ {
-		for x := 0; x < env.size; x++ {
-			currList = append(currList, idxByXY(env.grid, x, y))
-			finishedList = append(finishedList, idxByXY(finishedMap, x, y))
-		}
-	}
-	// iter on ids
-	for pivot := range currList {
-		if currList[pivot] != 0 {
-			// find pivot in result
-			k := idxByVAL(finishedList, currList[pivot])
-			// for each next id in curr
-			for i := range currList[pivot+1:] {
-				// check if next val in curr < pos pivot in res
-				j := idxByVAL(finishedList, currList[pivot+i])
-				if j < k {
-					inversions++
-				}
-			}
-		}
-	}
+	inversions := env.countInversions()
 	// if size is ODD
 	if env.size%2 != 0 {
 		//inversions must be EVEN

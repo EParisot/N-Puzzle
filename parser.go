@@ -42,7 +42,7 @@ func printUsage() {
 			-m map        = 'map_file.map'
 			-i image      = 'image_file.png'
 			-s size       = 'map size (int)'
-			-a heuristic  = 'heuristic' (default 'manhattan distance')
+			-h heuristic  = 'heuristic' (default 'manhattan distance')
 			-dg (Add numbers to the picture)
 			`)
 }
@@ -66,8 +66,10 @@ func (env *Env) parseArgs() error {
 				return errors.New("error invalid size value")
 			}
 			env.size = size
-		} else if arg == "-a" && i+1 < len(os.Args) {
-			env.autoMode = true
+		} else if arg == "-h" && i+1 < len(os.Args) {
+			if os.Args[i+1] != "md" && os.Args[i+1] != "c" && os.Args[i+1] != "i" {
+				return errors.New("error invalid heuristic value")
+			}
 			env.heuristic = os.Args[i+1]
 		} else if arg == "-dg" {
 			env.digit = true

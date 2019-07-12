@@ -15,11 +15,11 @@ type Env struct {
 	finishedMap *Grid
 	size        int
 	sizeWindows int
-	autoMode    bool
 	heuristic   string
 	digit       bool
 }
 
+// Grid hold the map
 type Grid struct {
 	mapping   []*cell
 	cost      int
@@ -37,6 +37,7 @@ func main() {
 	env := Env{
 		grid:        &Grid{},
 		finishedMap: &Grid{},
+		heuristic:   "md",
 	}
 	err := env.parseFile()
 	if err != nil {

@@ -41,8 +41,6 @@ func (env *Env) aStar() {
 		// Unstack first cell of open list
 		currGrid := openList[0]
 		env.grid = CopyGrid(currGrid)
-		//fmt.Println("Initial Grid :")
-		//env.printGrid(env.grid)
 		// Check end
 		if env.isFinished() {
 			closedList = append(closedList, currGrid)
@@ -51,15 +49,10 @@ func (env *Env) aStar() {
 		}
 		//for each possible move
 		movesList := env.getMoves(currGrid)
-
-		//for move := 0; move < len(movesList); move++ {
-		//	fmt.Println("Possible Move :")
-		//	env.printGrid(movesList[move])
-		//}
 		var j int
 		j = 0
 		for _, newGrid := range movesList {
-			if !env.havedouble(newGrid, antiBoucle) {
+			if !havedouble(newGrid, antiBoucle) {
 				openList = append(openList, newGrid)
 				antiBoucle = append(antiBoucle, newGrid)
 				j++
@@ -80,8 +73,7 @@ func (env *Env) aStar() {
 	fmt.Println("aStar returned no solution")
 }
 
-// Equal check if two cells are equal
-func Equal(a, b []*cell) bool {
+func equal(a, b []*cell) bool {
 	for i := 0; i < len(a); i++ {
 		if a[i].X != b[i].X || a[i].Y != b[i].Y {
 			return false
@@ -90,9 +82,9 @@ func Equal(a, b []*cell) bool {
 	return true
 }
 
-func (env *Env) havedouble(gridToCheck *Grid, openList []*Grid) bool {
+func havedouble(gridToCheck *Grid, openList []*Grid) bool {
 	for i := 0; i < len(openList); i++ {
-		if Equal(gridToCheck.mapping, openList[i].mapping) {
+		if equal(gridToCheck.mapping, openList[i].mapping) {
 			return true
 		}
 	}
@@ -163,16 +155,18 @@ func CopyGrid(srcGrid *Grid) *Grid {
 }
 
 func (env *Env) globalHeuristic(currGrid *Grid) int {
-	gManDist := 0
+	gHeur := 0
 	for id := 0; id < len(currGrid.mapping); id++ {
 		switch {
 		case env.heuristic == "" || env.heuristic == "md":
-			gManDist += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
+			gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
 		case env.heuristic == "c":
-			gManDist += countLeft(currGrid.mapping[id], env.finishedMap.mapping[id])
+			gHeur += countLeft(currGrid.mapping[id], env.finishedMap.mapping[id])
+		case env.heuristic == "i":
+			gHeur += env.countInversions()
 		}
 	}
-	return gManDist
+	return gHeur
 }
 
 // Heuristics :
@@ -187,4 +181,33 @@ func countLeft(a, b *cell) int {
 		return 1
 	}
 	return 0
+}
+
+func (env *Env) countInversions() int {
+	var currList []int
+	var finishedList []int
+	finishedMap := env.finishedMap
+	for y := 0; y < env.size; y++ {
+		for x := 0; x < env.size; x++ {
+			currList = append(currList, idxByXY(env.grid, x, y))
+			finishedList = append(finishedList, idxByXY(finishedMap, x, y))
+		}
+	}
+	// iter on ids to count inversions
+	inversions := 0
+	for pivot := range currList {
+		if currList[pivot] != 0 {
+			// find pivot in result
+			k := idxByVAL(finishedList, currList[pivot])
+			// for each next id in curr
+			for i := range currList[pivot+1:] {
+				// check if next val in curr < pos pivot in res
+				j := idxByVAL(finishedList, currList[pivot+i])
+				if j < k {
+					inversions++
+				}
+			}
+		}
+	}
+	return inversions
 }
