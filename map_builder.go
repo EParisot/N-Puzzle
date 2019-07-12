@@ -3,19 +3,17 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"time"
 )
 
 func (env *Env) buildMap() {
 	newMap := make([]*cell, env.size*env.size)
 	env.grid.mapping = newMap
 	env.buildFinished()
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	fmt.Println("Building map...")
 	for env.checkSolvability() == false {
 		env.grid = CopyGrid(env.finishedMap)
 		for i := 0; i < 10000; i++ {
-			env.shuffle(r)
+			env.shuffle(env.seed)
 		}
 	}
 }

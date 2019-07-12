@@ -104,7 +104,8 @@ func isPresentID(currGrid *Grid, gridList []*Grid) int {
 
 func (env *Env) getMoves(currGrid *Grid) []*Grid {
 	var gridList []*Grid
-	for direction := 1; direction < 5; direction++ {
+	for _, direction := range env.seed.Perm(4) {
+		direction++
 		i := env.checkMove(currGrid, direction)
 		if i >= 0 {
 			newGrid := env.virtualMove(currGrid, direction, i)

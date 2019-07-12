@@ -3,6 +3,8 @@ package main
 import (
 	"image"
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/hajimehoshi/ebiten"
 )
@@ -17,6 +19,7 @@ type Env struct {
 	sizeWindows int
 	heuristic   string
 	digit       bool
+	seed        *rand.Rand
 }
 
 // Grid hold the map
@@ -38,6 +41,7 @@ func main() {
 		grid:        &Grid{},
 		finishedMap: &Grid{},
 		heuristic:   "md",
+		seed:        rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 	err := env.parseFile()
 	if err != nil {
