@@ -20,6 +20,7 @@ type Env struct {
 	heuristic   string
 	digit       bool
 	seed        *rand.Rand
+	graph       bool
 }
 
 // Grid hold the map
@@ -58,9 +59,13 @@ func main() {
 	}
 	env.cropImage(env.imgFile)
 	//start Algo
-	go env.botPlayer()
-	go env.getKey()
-	if err := ebiten.Run(env.update, env.sizeWindows, env.sizeWindows, 2, "N-Puzzle"); err != nil {
-		log.Fatal(err)
+	if env.graph {
+		go env.getKey()
+		go env.botPlayer()
+		if err := ebiten.Run(env.update, env.sizeWindows, env.sizeWindows, 2, "N-Puzzle"); err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		env.botPlayer()
 	}
 }

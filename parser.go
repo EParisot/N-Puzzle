@@ -73,6 +73,8 @@ func (env *Env) parseArgs() error {
 			env.heuristic = os.Args[i+1]
 		} else if arg == "-dg" {
 			env.digit = true
+		} else if arg == "-g" {
+			env.graph = true
 		}
 	}
 	if env.mapFile == "" {

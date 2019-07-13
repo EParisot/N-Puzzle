@@ -12,13 +12,16 @@ import (
 func (env *Env) botPlayer() {
 	env.buildFinished()
 	// wait for graphics
-	fmt.Println("Press SPACE to start bot...")
-	for {
-		if ebiten.IsKeyPressed(ebiten.KeySpace) {
-			break
+	if env.graph {
+		fmt.Println("Press SPACE to start bot...")
+		for {
+			if ebiten.IsKeyPressed(ebiten.KeySpace) {
+				break
+			}
+			time.Sleep(DELAY)
 		}
-		time.Sleep(DELAY)
 	}
+	fmt.Println("Start...")
 	// start algo
 	env.aStar()
 }
@@ -101,14 +104,14 @@ func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
 func (env *Env) globalHeuristic(currGrid *Grid) int {
 	gHeur := 0
 
-	for id := 0; id < len(currGrid.mapping); id++ {
+	for id := 1; id < len(currGrid.mapping); id++ {
 		switch {
 		case env.heuristic == "" || env.heuristic == "md":
-			gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id], id)
+			gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
 		case env.heuristic == "hd":
-			gHeur += hammingDistance(currGrid.mapping[id], env.finishedMap.mapping[id], id)
+			gHeur += hammingDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
 		case env.heuristic == "lc":
-			gHeur += linearConflicts(currGrid, currGrid.mapping[id], env.finishedMap.mapping[id], id)
+			gHeur += env.linearConflicts(currGrid, currGrid.mapping[id], env.finishedMap.mapping[id], id)
 		}
 
 	}
@@ -117,29 +120,45 @@ func (env *Env) globalHeuristic(currGrid *Grid) int {
 
 // Heuristics :
 
-func manhattanDistance(a, b *cell, id int) int {
-	if id == 0 {
-		return 0
-	}
+func manhattanDistance(a, b *cell) int {
 	return int(math.Abs(float64(a.X)-float64(b.X)) +
 		math.Abs(float64(a.Y)-float64(b.Y)))
 }
 
-func hammingDistance(a, b *cell, id int) int {
-	if id != 0 && (a.X != b.X || a.Y != b.Y) {
+func hammingDistance(a, b *cell) int {
+	if a.X != b.X || a.Y != b.Y {
 		return 1
 	}
 	return 0
 }
 
-func linearConflicts(currGrid *Grid, a, b *cell, id int) int {
-	if id == 0 {
-		return 0
-	}
-	md := manhattanDistance(a, b, id)
+func (env *Env) linearConflicts(currGrid *Grid, a, b *cell, id int) int {
+	md := manhattanDistance(a, b)
 	lc := 0
-	if (a.X == b.X && a.Y != b.Y) || (a.X != b.X && a.Y == b.Y) {
-		lc++
+	if a.X == b.X && a.Y != b.Y {
+		for i := 0; i < env.size; i++ {
+			if i != a.Y {
+				idx := idxByXY(currGrid, a.X, i)
+				if idx != 0 {
+					if currGrid.mapping[idx].X == env.finishedMap.mapping[idx].X &&
+						currGrid.mapping[idx].Y != env.finishedMap.mapping[idx].Y {
+						lc++
+					}
+				}
+			}
+		}
+	} else if a.X != b.X && a.Y == b.Y {
+		for i := 0; i < env.size; i++ {
+			if i != a.X {
+				idx := idxByXY(currGrid, i, a.Y)
+				if idx != 0 {
+					if currGrid.mapping[idx].X != env.finishedMap.mapping[idx].X &&
+						currGrid.mapping[idx].Y == env.finishedMap.mapping[idx].Y {
+						lc++
+					}
+				}
+			}
+		}
 	}
-	return (2 * lc) + md
+	return lc + md
 }

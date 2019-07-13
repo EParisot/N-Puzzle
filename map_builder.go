@@ -12,7 +12,7 @@ func (env *Env) buildMap() {
 	fmt.Println("Building map...")
 	for env.checkSolvability(env.grid) == false {
 		env.grid = copyGrid(env.finishedMap)
-		for i := 0; i < 10000; i++ {
+		for i := 0; i < env.size*env.size*1000; i++ {
 			env.shuffle(env.seed)
 		}
 	}
