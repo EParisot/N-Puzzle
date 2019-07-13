@@ -11,7 +11,7 @@ import (
 
 func (env *Env) botPlayer() {
 	env.buildFinished()
-	// wait for graphics
+	// Wait for graphics
 	if env.graph {
 		fmt.Println("Press SPACE to start bot...")
 		for {
@@ -22,7 +22,7 @@ func (env *Env) botPlayer() {
 		}
 	}
 	fmt.Println("Start...")
-	// start algo
+	// Start algo
 	env.aStar()
 }
 
@@ -47,17 +47,18 @@ func (env *Env) aStar() {
 			fmt.Println("Astar done in ", len(closedList)-1, "turns")
 			return
 		}
-		//for each possible move
+		// For each possible move
 		movesList := env.getMoves(currGrid)
 		for _, newGrid := range movesList {
 			if !equal(newGrid.mapping, lastGrid.mapping) {
+				// Append newGrid to openList
 				openList = append(openList, newGrid)
 			}
 		}
-		//append currGrid to closedList
+		// Append currGrid to closedList
 		closedList = append(closedList, currGrid)
 		lastGrid = currGrid
-		// sort openList
+		// Sort openList
 		sort.Slice(openList, func(i, j int) bool {
 			return openList[i].heuristic < openList[j].heuristic
 		})
@@ -110,6 +111,8 @@ func (env *Env) globalHeuristic(currGrid *Grid) int {
 			gHeur += manhattanDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
 		case env.heuristic == "hd":
 			gHeur += hammingDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
+		case env.heuristic == "ed":
+			gHeur += euclidianDistance(currGrid.mapping[id], env.finishedMap.mapping[id])
 		case env.heuristic == "lc":
 			gHeur += env.linearConflicts(currGrid, currGrid.mapping[id], env.finishedMap.mapping[id], id)
 		}
@@ -123,6 +126,11 @@ func (env *Env) globalHeuristic(currGrid *Grid) int {
 func manhattanDistance(a, b *cell) int {
 	return int(math.Abs(float64(a.X)-float64(b.X)) +
 		math.Abs(float64(a.Y)-float64(b.Y)))
+}
+
+func euclidianDistance(a, b *cell) int {
+	return int(math.Sqrt(math.Pow(float64(a.X)-float64(b.X), 2) +
+		math.Pow(float64(a.Y)-float64(b.Y), 2)))
 }
 
 func hammingDistance(a, b *cell) int {
@@ -160,5 +168,5 @@ func (env *Env) linearConflicts(currGrid *Grid, a, b *cell, id int) int {
 			}
 		}
 	}
-	return lc + md
+	return (lc / 2) + md
 }
