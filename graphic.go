@@ -61,55 +61,6 @@ func (env *Env) getKey() {
 	}
 }
 
-func (env *Env) checkMove(currGrid *Grid, move int) int {
-	if move == UP && currGrid.mapping[0].Y != env.size-1 {
-		for i := range currGrid.mapping {
-			if currGrid.mapping[i].X == currGrid.mapping[0].X && currGrid.mapping[i].Y == currGrid.mapping[0].Y+1 {
-				return i
-			}
-		}
-	} else if move == DOWN && currGrid.mapping[0].Y != 0 {
-		for i := range currGrid.mapping {
-			if currGrid.mapping[i].X == currGrid.mapping[0].X && currGrid.mapping[i].Y == currGrid.mapping[0].Y-1 {
-				return i
-			}
-		}
-	} else if move == LEFT && currGrid.mapping[0].X != env.size-1 {
-		for i := range currGrid.mapping {
-			if currGrid.mapping[i].X == currGrid.mapping[0].X+1 && currGrid.mapping[i].Y == currGrid.mapping[0].Y {
-				return i
-			}
-		}
-	} else if move == RIGHT && currGrid.mapping[0].X != 0 {
-		for i := range currGrid.mapping {
-			if currGrid.mapping[i].X == currGrid.mapping[0].X-1 && currGrid.mapping[i].Y == currGrid.mapping[0].Y {
-				return i
-			}
-		}
-	}
-	return -1
-}
-
-func (env *Env) moveCell(currGrid *Grid, direction int) {
-	i := env.checkMove(currGrid, direction)
-	if i >= 0 {
-		switch {
-		case direction == UP:
-			currGrid.mapping[0].Y++
-			currGrid.mapping[i].Y--
-		case direction == DOWN:
-			currGrid.mapping[0].Y--
-			currGrid.mapping[i].Y++
-		case direction == LEFT:
-			currGrid.mapping[0].X++
-			currGrid.mapping[i].X--
-		case direction == RIGHT:
-			currGrid.mapping[0].X--
-			currGrid.mapping[i].X++
-		}
-	}
-}
-
 func (env *Env) addSquare(x float64, y float64, square *ebiten.Image, screen *ebiten.Image, i int) {
 
 	var err error

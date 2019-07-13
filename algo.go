@@ -10,6 +10,7 @@ import (
 )
 
 func (env *Env) botPlayer() {
+	env.buildFinished()
 	// wait for graphics
 	fmt.Println("Press SPACE to start bot...")
 	for {
@@ -19,87 +20,46 @@ func (env *Env) botPlayer() {
 		time.Sleep(DELAY)
 	}
 	// start algo
-	env.algo()
-}
-
-func (env *Env) algo() {
-	env.buildFinished()
 	env.aStar()
 }
 
 func (env *Env) aStar() {
 	var closedList []*Grid
 	var openList []*Grid
-	var antiBoucle []*Grid
-	var i int
-	i = 0
 	// Append start node to open list
+	openList = append(openList, env.grid)
 	env.grid.cost = 0
 	env.grid.heuristic = env.globalHeuristic(env.grid)
-	openList = append(openList, env.grid)
+	lastGrid := env.grid
 	for len(openList) != 0 {
 		// Unstack first cell of open list
 		currGrid := openList[0]
-		env.grid = CopyGrid(currGrid)
+		// Clear openList
+		openList = openList[:0]
+		// Update state
+		env.grid = currGrid
 		// Check end
 		if env.isFinished() {
 			closedList = append(closedList, currGrid)
-			fmt.Println(len(closedList))
+			fmt.Println("Astar done in ", len(closedList)-1, "turns")
 			return
 		}
 		//for each possible move
 		movesList := env.getMoves(currGrid)
-		var j int
-		j = 0
 		for _, newGrid := range movesList {
-			if !havedouble(newGrid, antiBoucle) {
+			if !equal(newGrid.mapping, lastGrid.mapping) {
 				openList = append(openList, newGrid)
-				antiBoucle = append(antiBoucle, newGrid)
-				j++
 			}
 		}
-		if j != 0 {
-			//append currGrid to closedList
-			closedList = append(closedList, currGrid)
-		}
-		// pop currGrid from openList
-		openList = openList[1:]
+		//append currGrid to closedList
+		closedList = append(closedList, currGrid)
+		lastGrid = currGrid
 		// sort openList
 		sort.Slice(openList, func(i, j int) bool {
 			return openList[i].heuristic < openList[j].heuristic
 		})
-		i++
 	}
-	fmt.Println("aStar returned no solution")
-}
-
-func equal(a, b []*cell) bool {
-	for i := 0; i < len(a); i++ {
-		if a[i].X != b[i].X || a[i].Y != b[i].Y {
-			return false
-		}
-	}
-	return true
-}
-
-func havedouble(gridToCheck *Grid, openList []*Grid) bool {
-	for i := 0; i < len(openList); i++ {
-		if equal(gridToCheck.mapping, openList[i].mapping) {
-			return true
-		}
-	}
-	return false
-}
-
-func isPresentID(currGrid *Grid, gridList []*Grid) int {
-	for i, grid := range gridList {
-		for cell := 0; cell < len(currGrid.mapping); cell++ {
-			if grid.mapping[cell] == currGrid.mapping[cell] {
-				return i
-			}
-		}
-	}
-	return -1
+	fmt.Println("Astar returned no solution")
 }
 
 func (env *Env) getMoves(currGrid *Grid) []*Grid {
@@ -116,7 +76,7 @@ func (env *Env) getMoves(currGrid *Grid) []*Grid {
 }
 
 func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
-	newGrid := CopyGrid(currGrid)
+	newGrid := copyGrid(currGrid)
 	if i >= 0 {
 		switch {
 		case direction == UP:
@@ -135,23 +95,6 @@ func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
 		newGrid.cost = newGrid.cost + 1
 		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)
 	}
-	return newGrid
-}
-
-// CopyGrid copy a grid
-func CopyGrid(srcGrid *Grid) *Grid {
-	newGrid := &Grid{}
-	newGrid.mapping = make([]*cell, len(srcGrid.mapping))
-	for i := 0; i < len(srcGrid.mapping); i++ {
-		newCell := cell{}
-		newCell.X = srcGrid.mapping[i].X
-		newCell.Y = srcGrid.mapping[i].Y
-		newCell.cellImg = srcGrid.mapping[i].cellImg
-		newCell.digitImg = srcGrid.mapping[i].digitImg
-		newGrid.mapping[i] = &newCell
-	}
-	newGrid.cost = srcGrid.cost
-	newGrid.heuristic = srcGrid.heuristic
 	return newGrid
 }
 

@@ -11,7 +11,7 @@ func (env *Env) buildMap() {
 	env.buildFinished()
 	fmt.Println("Building map...")
 	for env.checkSolvability(env.grid) == false {
-		env.grid = CopyGrid(env.finishedMap)
+		env.grid = copyGrid(env.finishedMap)
 		for i := 0; i < 10000; i++ {
 			env.shuffle(env.seed)
 		}
@@ -59,8 +59,8 @@ func (env *Env) countInversions() int {
 	finishedMap := env.finishedMap
 	for y := 0; y < env.size; y++ {
 		for x := 0; x < env.size; x++ {
-			currList = append(currList, IdxByXY(env.grid, x, y))
-			finishedList = append(finishedList, IdxByXY(finishedMap, x, y))
+			currList = append(currList, idxByXY(env.grid, x, y))
+			finishedList = append(finishedList, idxByXY(finishedMap, x, y))
 		}
 	}
 	// iter on ids to count inversions
@@ -82,24 +82,4 @@ func (env *Env) countInversions() int {
 		}
 	}
 	return inversions
-}
-
-func idxByVAL(list []int, val int) int {
-	i := 0
-	for i = range list {
-		if list[i] == val {
-			break
-		}
-	}
-	return i
-}
-
-func IdxByXY(grid *Grid, x, y int) int {
-	i := 0
-	for i = range grid.mapping {
-		if grid.mapping[i].X == x && grid.mapping[i].Y == y {
-			break
-		}
-	}
-	return i
 }
