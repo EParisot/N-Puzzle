@@ -20,7 +20,7 @@ func (env *Env) botPlayer() {
 			time.Sleep(DELAY)
 		}
 	}
-	fmt.Println("Start...")
+	fmt.Println("Working...")
 	// Start algo
 	env.idAstar()
 }
