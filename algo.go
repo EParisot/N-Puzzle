@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"sort"
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
@@ -23,11 +22,8 @@ func (env *Env) botPlayer() {
 	}
 	fmt.Println("Start...")
 	// Start algo
-	//env.aStar()
 	env.idAstar()
 }
-
-/////// IDASTAR TEST ///////
 
 func (env *Env) reconstructPathIDA(closedList []*Grid, endGrid *Grid) {
 	fmt.Println("Ordered sequence of states that make up the solution : ")
@@ -83,74 +79,6 @@ func (env *Env) search(threshold int, closedList []*Grid) (int, []*Grid) {
 		}
 	}
 	return min, closedList
-}
-
-/////// IDASTAR TEST ///////
-
-func (env *Env) reconstructPath(closedList []*Grid, endGrid *Grid) {
-	var finalList []*Grid
-	var parentID int
-
-	finalList = append(finalList, endGrid)
-	parentID = endGrid.parentID
-	for i := 0; i < len(closedList); i++ {
-		if closedList[i].id == parentID {
-			finalList = append(finalList, closedList[i])
-			parentID = closedList[i].parentID
-			if parentID == 0 {
-				//End
-				//Print solution in reverse order
-				fmt.Println("Ordered sequence of states that make up the solution : ")
-				for j := len(finalList) - 1; j != -1; j-- {
-					env.printGrid(finalList[j])
-				}
-				fmt.Println("Number of moves required : ", len(finalList)-1)
-				fmt.Println("Complexity in size : ", len(closedList))
-				return
-			}
-			i = -1
-		}
-	}
-
-}
-
-func (env *Env) aStar() {
-	var closedList []*Grid
-	var openList []*Grid
-	var currGrid *Grid
-
-	// Append start node to open list
-	openList = append(openList, env.grid)
-	env.grid.cost = 0
-	env.grid.heuristic = env.globalHeuristic(env.grid)
-	env.grid.id = env.getID()
-	env.grid.parentID = 0
-
-	for len(openList) != 0 {
-		// Unstack first cell of open list
-		currGrid, openList = openList[0], openList[1:]
-		// Update state
-		env.grid = currGrid
-		// Check end
-		if env.isFinished(nil) {
-			env.reconstructPath(closedList, currGrid)
-			return
-		}
-		// For each possible move
-		movesList := env.getMoves(currGrid)
-		for _, newGrid := range movesList {
-			if existInClosedList(newGrid, closedList) || existInOpenListWithInferiorCost(newGrid, openList) {
-			} else {
-				openList = append(openList, newGrid)
-				sort.Slice(openList, func(i, j int) bool {
-					return openList[i].heuristic < openList[j].heuristic
-				})
-			}
-		}
-		// Append currGrid to closedList
-		closedList = append(closedList, currGrid)
-	}
-	fmt.Println("Astar returned no solution")
 }
 
 func (env *Env) getMoves(currGrid *Grid) []*Grid {
