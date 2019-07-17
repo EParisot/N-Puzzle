@@ -27,34 +27,16 @@ func (env *Env) botPlayer() {
 	env.idAstar()
 }
 
-func (env *Env) reconstructPath(closedList []*Grid, endGrid *Grid) {
-	var finalList []*Grid
-	var parentID int
-
-	finalList = append(finalList, endGrid)
-	parentID = endGrid.parentID
-	for i := 0; i < len(closedList); i++ {
-		if closedList[i].id == parentID {
-			finalList = append(finalList, closedList[i])
-			parentID = closedList[i].parentID
-			if parentID == 0 {
-				//End
-				//Print solution in reverse order
-				fmt.Println("Ordered sequence of states that make up the solution : ")
-				for j := len(finalList) - 1; j != -1; j-- {
-					env.printGrid(finalList[j])
-				}
-				fmt.Println("Number of moves required : ", len(finalList)-1)
-				fmt.Println("Complexity in size : ", len(closedList))
-				return
-			}
-			i = -1
-		}
-	}
-
-}
-
 /////// IDASTAR TEST ///////
+
+func (env *Env) reconstructPathIDA(closedList []*Grid, endGrid *Grid) {
+	fmt.Println("Ordered sequence of states that make up the solution : ")
+	for _, step := range closedList {
+		env.grid = step
+		env.printGrid(step)
+	}
+	fmt.Println("Number of moves required : ", len(closedList))
+}
 
 func (env *Env) idAstar() {
 	threshold := env.globalHeuristic(env.grid)
@@ -67,11 +49,7 @@ func (env *Env) idAstar() {
 		tmpThres, closedList := env.search(threshold, closedList)
 		if tmpThres == -1 {
 			fmt.Println("IDAstar Done")
-			// test
-			for _, grid := range closedList {
-				env.grid = grid
-			}
-			// end test
+			env.reconstructPathIDA(closedList, closedList[len(closedList)-1])
 			return
 		} else if tmpThres >= 100000 {
 			fmt.Println("IDAstar returned no solution")
@@ -108,6 +86,33 @@ func (env *Env) search(threshold int, closedList []*Grid) (int, []*Grid) {
 }
 
 /////// IDASTAR TEST ///////
+
+func (env *Env) reconstructPath(closedList []*Grid, endGrid *Grid) {
+	var finalList []*Grid
+	var parentID int
+
+	finalList = append(finalList, endGrid)
+	parentID = endGrid.parentID
+	for i := 0; i < len(closedList); i++ {
+		if closedList[i].id == parentID {
+			finalList = append(finalList, closedList[i])
+			parentID = closedList[i].parentID
+			if parentID == 0 {
+				//End
+				//Print solution in reverse order
+				fmt.Println("Ordered sequence of states that make up the solution : ")
+				for j := len(finalList) - 1; j != -1; j-- {
+					env.printGrid(finalList[j])
+				}
+				fmt.Println("Number of moves required : ", len(finalList)-1)
+				fmt.Println("Complexity in size : ", len(closedList))
+				return
+			}
+			i = -1
+		}
+	}
+
+}
 
 func (env *Env) aStar() {
 	var closedList []*Grid
