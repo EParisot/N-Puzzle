@@ -44,6 +44,7 @@ func printUsage() {
 			-s size       = map size (int)
 			-h heuristic  = 'heuristic' ('md' (default), 'hd', 'i')
 			-dg (Add numbers to the picture)
+			-g (Active graphic)
 			`)
 }
 
