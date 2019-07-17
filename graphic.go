@@ -33,7 +33,7 @@ func (env *Env) update(screen *ebiten.Image) error {
 	//Fill the screen with background color
 	screen.Fill(color.NRGBA{0xff, 0x00, 0x00, 0xff})
 	//Handle controls
-	if !env.isFinished() {
+	if !env.isFinished(nil) {
 		env.getKey()
 	}
 	for i := range env.grid.mapping {

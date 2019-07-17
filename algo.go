@@ -23,7 +23,8 @@ func (env *Env) botPlayer() {
 	}
 	fmt.Println("Start...")
 	// Start algo
-	env.aStar()
+	//env.aStar()
+	env.idAstar()
 }
 
 func (env *Env) reconstructPath(closedList []*Grid, endGrid *Grid) {
@@ -53,6 +54,61 @@ func (env *Env) reconstructPath(closedList []*Grid, endGrid *Grid) {
 
 }
 
+/////// IDASTAR TEST ///////
+
+func (env *Env) idAstar() {
+	threshold := env.globalHeuristic(env.grid)
+	env.grid.id = env.getID()
+	env.grid.parentID = 0
+	var closedList []*Grid
+	closedList = append(closedList, env.grid)
+
+	for {
+		tmpThres, closedList := env.search(threshold, closedList)
+		if tmpThres == -1 {
+			fmt.Println("IDAstar Done")
+			// test
+			for _, grid := range closedList {
+				env.grid = grid
+			}
+			// end test
+			return
+		} else if tmpThres >= 100000 {
+			fmt.Println("IDAstar returned no solution")
+			return
+		}
+		threshold = tmpThres
+	}
+}
+
+func (env *Env) search(threshold int, closedList []*Grid) (int, []*Grid) {
+	currGrid := closedList[len(closedList)-1]
+	if currGrid.heuristic > threshold {
+		return currGrid.heuristic, closedList
+	}
+	if env.isFinished(currGrid) {
+		return -1, closedList
+	}
+	min := 100000
+	childsList := env.getMoves(currGrid)
+	for _, child := range childsList {
+		if !existInClosedList(child, closedList) {
+			closedList = append(closedList, child)
+			tmp, closedList := env.search(threshold, closedList)
+			if tmp == -1 {
+				return -1, closedList
+			}
+			if tmp < min {
+				min = tmp
+			}
+			closedList = closedList[:len(closedList)-1]
+		}
+	}
+	return min, closedList
+}
+
+/////// IDASTAR TEST ///////
+
 func (env *Env) aStar() {
 	var closedList []*Grid
 	var openList []*Grid
@@ -71,7 +127,7 @@ func (env *Env) aStar() {
 		// Update state
 		env.grid = currGrid
 		// Check end
-		if env.isFinished() {
+		if env.isFinished(nil) {
 			env.reconstructPath(closedList, currGrid)
 			return
 		}

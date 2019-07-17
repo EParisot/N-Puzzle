@@ -97,12 +97,17 @@ func (env *Env) buildFinished() {
 	env.finishedMap.mapping = finished
 }
 
-func (env *Env) isFinished() bool {
+// if grid is nil, eval the env.grid
+func (env *Env) isFinished(grid *Grid) bool {
+	if grid == nil {
+		grid = env.grid
+	}
 	if len(env.finishedMap.mapping) == 0 {
 		env.buildFinished()
 	}
 	for id := 1; id < env.size*env.size; id++ {
-		if env.grid.mapping[id].X != env.finishedMap.mapping[id].X || env.grid.mapping[id].Y != env.finishedMap.mapping[id].Y {
+		if grid.mapping[id].X != env.finishedMap.mapping[id].X ||
+			grid.mapping[id].Y != env.finishedMap.mapping[id].Y {
 			return false
 		}
 	}
