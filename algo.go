@@ -26,42 +26,68 @@ func (env *Env) botPlayer() {
 	env.aStar()
 }
 
+func (env *Env) reconstructPath(closedList []*Grid, endGrid *Grid) {
+	var finalList []*Grid
+	var parentID int
+
+	finalList = append(finalList, endGrid)
+	parentID = endGrid.parentID
+	for i := 0; i < len(closedList); i++ {
+		if closedList[i].id == parentID {
+			finalList = append(finalList, closedList[i])
+			parentID = closedList[i].parentID
+			if parentID == 0 {
+				//End
+				//Print solution in reverse order
+				fmt.Println("Ordered sequence of states that make up the solution : ")
+				for j := len(finalList) - 1; j != -1; j-- {
+					env.printGrid(finalList[j])
+				}
+				fmt.Println("Number of moves required : ", len(finalList)-1)
+				fmt.Println("Complexity in size : ", len(closedList))
+				return
+			}
+			i = -1
+		}
+	}
+
+}
+
 func (env *Env) aStar() {
 	var closedList []*Grid
 	var openList []*Grid
+	var currGrid *Grid
+
 	// Append start node to open list
 	openList = append(openList, env.grid)
 	env.grid.cost = 0
 	env.grid.heuristic = env.globalHeuristic(env.grid)
-	lastGrid := env.grid
+	env.grid.id = env.getID()
+	env.grid.parentID = 0
+
 	for len(openList) != 0 {
 		// Unstack first cell of open list
-		currGrid := openList[0]
-		// Clear openList
-		openList = openList[:0]
+		currGrid, openList = openList[0], openList[1:]
 		// Update state
 		env.grid = currGrid
 		// Check end
 		if env.isFinished() {
-			closedList = append(closedList, currGrid)
-			fmt.Println("Astar done in ", len(closedList)-1, "turns")
+			env.reconstructPath(closedList, currGrid)
 			return
 		}
 		// For each possible move
 		movesList := env.getMoves(currGrid)
 		for _, newGrid := range movesList {
-			if !equal(newGrid.mapping, lastGrid.mapping) {
-				// Append newGrid to openList
+			if existInClosedList(newGrid, closedList) || existInOpenListWithInferiorCost(newGrid, openList) {
+			} else {
 				openList = append(openList, newGrid)
+				sort.Slice(openList, func(i, j int) bool {
+					return openList[i].heuristic < openList[j].heuristic
+				})
 			}
 		}
 		// Append currGrid to closedList
 		closedList = append(closedList, currGrid)
-		lastGrid = currGrid
-		// Sort openList
-		sort.Slice(openList, func(i, j int) bool {
-			return openList[i].heuristic < openList[j].heuristic
-		})
 	}
 	fmt.Println("Astar returned no solution")
 }
@@ -96,8 +122,10 @@ func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
 			newGrid.mapping[0].X--
 			newGrid.mapping[i].X++
 		}
+		newGrid.id = env.getID()
+		newGrid.parentID = env.grid.id
 		newGrid.cost = newGrid.cost + 1
-		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)
+		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)*5
 	}
 	return newGrid
 }

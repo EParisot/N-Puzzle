@@ -58,7 +58,6 @@ func (env *Env) parseArgs() error {
 			env.mapFile = os.Args[i+1]
 		} else if arg == "-i" && i+1 < len(os.Args) &&
 			strings.HasSuffix(os.Args[i+1], ".png") {
-			fmt.Println("Here")
 			env.imgFile = os.Args[i+1]
 		} else if arg == "-s" && i+1 < len(os.Args) {
 			size, err := strconv.Atoi(os.Args[i+1])

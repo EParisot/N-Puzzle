@@ -134,6 +134,26 @@ func equal(a, b []*cell) bool {
 	return true
 }
 
+func existInClosedList(newGrid *Grid, closedList []*Grid) bool {
+	for i := 0; i < len(closedList); i++ {
+		if equal(closedList[i].mapping, newGrid.mapping) {
+			return true
+		}
+	}
+	return false
+}
+
+func existInOpenListWithInferiorCost(newGrid *Grid, openList []*Grid) bool {
+	for i := 0; i < len(openList); i++ {
+		if equal(newGrid.mapping, openList[i].mapping) {
+			if newGrid.cost < openList[i].cost {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (env *Env) isPresent(idToTest int) bool {
 	for id, cell := range env.grid.mapping {
 		if id == idToTest && cell != nil {
@@ -177,4 +197,9 @@ func idxByXY(grid *Grid, x, y int) int {
 		}
 	}
 	return i
+}
+
+func (env *Env) getID() int {
+	env.incrementID++
+	return env.incrementID
 }
