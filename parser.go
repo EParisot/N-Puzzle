@@ -38,9 +38,9 @@ func (env *Env) parseFile() error {
 }
 
 func printUsage() {
-	fmt.Println(`Usage : N-Puzzle map_file [-m map] [-i image] [-d difficulty] [-a heuristic]
-			-m map        = 'map_file.map'
-			-i image      = 'image_file.png'
+	fmt.Println(`Usage : ./N-Puzzle[.exe] [-s size] [-m mapFile] [-i imageFile] [-h heuristic] [-g] [-dg]
+			-m mapFile    = 'map_file.map'
+			-i imageFile  = 'image_file.png'
 			-s size       = map size (int)
 			-h heuristic  = 'heuristic' ('md' (default), 'hd', 'i')
 			-dg (Add numbers to the picture)
