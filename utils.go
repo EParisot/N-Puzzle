@@ -203,8 +203,3 @@ func idxByXY(grid *Grid, x, y int) int {
 	}
 	return i
 }
-
-func (env *Env) getID() int {
-	env.incrementID++
-	return env.incrementID
-}

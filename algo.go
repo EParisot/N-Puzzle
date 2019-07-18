@@ -36,8 +36,6 @@ func (env *Env) reconstructPathIDA(closedList []*Grid, endGrid *Grid) {
 
 func (env *Env) idAstar() {
 	threshold := env.globalHeuristic(env.grid)
-	env.grid.id = env.getID()
-	env.grid.parentID = 0
 	var closedList []*Grid
 	closedList = append(closedList, env.grid)
 
@@ -110,10 +108,8 @@ func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
 			newGrid.mapping[0].X--
 			newGrid.mapping[i].X++
 		}
-		newGrid.id = env.getID()
-		newGrid.parentID = env.grid.id
 		newGrid.cost = newGrid.cost + 1
-		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)*2
+		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)*env.w
 	}
 	return newGrid
 }
