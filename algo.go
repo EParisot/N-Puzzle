@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"math"
-	"sort"
 	"time"
 
 	"github.com/hajimehoshi/ebiten"
@@ -21,75 +20,75 @@ func (env *Env) botPlayer() {
 			time.Sleep(DELAY)
 		}
 	}
-	fmt.Println("Start...")
+	fmt.Println("Working...")
 	// Start algo
-	env.aStar()
+	env.idAstar()
 }
 
-func (env *Env) reconstructPath(closedList []*Grid, endGrid *Grid) {
-	var finalList []*Grid
-	var parentID int
-
-	finalList = append(finalList, endGrid)
-	parentID = endGrid.parentID
-	for i := 0; i < len(closedList); i++ {
-		if closedList[i].id == parentID {
-			finalList = append(finalList, closedList[i])
-			parentID = closedList[i].parentID
-			if parentID == 0 {
-				//End
-				//Print solution in reverse order
-				fmt.Println("Ordered sequence of states that make up the solution : ")
-				for j := len(finalList) - 1; j != -1; j-- {
-					env.printGrid(finalList[j])
-				}
-				fmt.Println("Number of moves required : ", len(finalList)-1)
-				fmt.Println("Complexity in size : ", len(closedList))
-				return
-			}
-			i = -1
-		}
+func (env *Env) reconstructPathIDA(closedList []*Grid, endGrid *Grid) {
+	fmt.Println("Ordered sequence of states that make up the solution : ")
+	for _, step := range closedList {
+		env.grid = step
+		env.printGrid(step)
 	}
-
+	fmt.Println("Number of moves required : ", len(closedList))
 }
 
-func (env *Env) aStar() {
+func (env *Env) idAstar() {
+	threshold := env.globalHeuristic(env.grid)
 	var closedList []*Grid
-	var openList []*Grid
-	var currGrid *Grid
-
-	// Append start node to open list
-	openList = append(openList, env.grid)
-	env.grid.cost = 0
-	env.grid.heuristic = env.globalHeuristic(env.grid)
-	env.grid.id = env.getID()
-	env.grid.parentID = 0
-
-	for len(openList) != 0 {
-		// Unstack first cell of open list
-		currGrid, openList = openList[0], openList[1:]
-		// Update state
-		env.grid = currGrid
-		// Check end
-		if env.isFinished() {
-			env.reconstructPath(closedList, currGrid)
+	closedList = append(closedList, env.grid)
+	env.startTime = time.Now()
+	for {
+		tmpThres, closedList := env.search(threshold, &closedList)
+		if tmpThres == -1 {
+			fmt.Println("IDAstar Done")
+			env.reconstructPathIDA(*closedList, (*closedList)[len(*closedList)-1])
+			return
+		} else if tmpThres >= 10000 {
+			fmt.Println("IDAstar returned no solution")
 			return
 		}
-		// For each possible move
-		movesList := env.getMoves(currGrid)
-		for _, newGrid := range movesList {
-			if existInClosedList(newGrid, closedList) || existInOpenListWithInferiorCost(newGrid, openList) {
+		threshold = tmpThres
+	}
+}
+
+func (env *Env) search(threshold int, closedList *[]*Grid) (int, *[]*Grid) {
+	if time.Since(env.startTime) >= 10000000000 {
+		var closedList []*Grid
+		closedList = append(closedList, env.grid)
+		fmt.Println("Incrementing W to ", env.w+1)
+		env.w++
+		env.startTime = time.Now()
+		return env.globalHeuristic(env.grid), &closedList
+	}
+	currGrid := (*closedList)[len(*closedList)-1]
+	if currGrid.heuristic > threshold {
+		return currGrid.heuristic, closedList
+	}
+	if env.isFinished(currGrid) {
+		return -1, closedList
+	}
+	min := 100000
+	childsList := env.getMoves(currGrid)
+	for _, child := range childsList {
+		if !existInClosedList(child, *closedList) {
+			*closedList = append(*closedList, child)
+			tmp, closedList := env.search(threshold, closedList)
+			if tmp == -1 {
+				return -1, closedList
+			}
+			if tmp < min {
+				min = tmp
+			}
+			if len(*closedList) > 1 {
+				*closedList = (*closedList)[:len(*closedList)-1]
 			} else {
-				openList = append(openList, newGrid)
-				sort.Slice(openList, func(i, j int) bool {
-					return openList[i].heuristic < openList[j].heuristic
-				})
+				return tmp, closedList
 			}
 		}
-		// Append currGrid to closedList
-		closedList = append(closedList, currGrid)
 	}
-	fmt.Println("Astar returned no solution")
+	return min, closedList
 }
 
 func (env *Env) getMoves(currGrid *Grid) []*Grid {
@@ -121,10 +120,8 @@ func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
 			newGrid.mapping[0].X--
 			newGrid.mapping[i].X++
 		}
-		newGrid.id = env.getID()
-		newGrid.parentID = env.grid.id
 		newGrid.cost = newGrid.cost + 1
-		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)*5
+		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)*env.w
 	}
 	return newGrid
 }

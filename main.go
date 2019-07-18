@@ -21,7 +21,8 @@ type Env struct {
 	digit       bool
 	seed        *rand.Rand
 	graph       bool
-	incrementID int
+	w           int
+	startTime   time.Time
 }
 
 // Grid hold the map
@@ -29,8 +30,6 @@ type Grid struct {
 	mapping   []*cell
 	cost      int
 	heuristic int
-	id        int
-	parentID  int
 }
 
 type cell struct {
@@ -46,7 +45,7 @@ func main() {
 		finishedMap: &Grid{},
 		heuristic:   "md",
 		seed:        rand.New(rand.NewSource(time.Now().UnixNano())),
-		incrementID: 0,
+		w:           1,
 	}
 	err := env.parseFile()
 	if err != nil {
