@@ -11,11 +11,12 @@ go build
 
 Run
 ```
-./N-Puzzle[.exe] [-m mapFile] [-i imageFile] [-d difficulty] [-a heuristic] [-g] [-dg]
-                        -m mapFile    = 'map_file.map'
-                        -i imageFile  = 'image_file.png'
-                        -s size       = map size (int)
-                        -h heuristic  = 'heuristic' ('md' (default), 'hd', 'i')
-                        -dg (Add numbers to the picture)
-                        -g (Active graphic)
+./N-Puzzle[.exe] [-m mapFile] [-i imageFile] [-d difficulty] [-a heuristic] [-gs] [-g] [-dg]
+			-m mapFile    = 'map_file.map'
+			-i imageFile  = 'image_file.png'
+			-s size       = map size (int)
+			-h heuristic  = 'heuristic' ('md' (default), 'hd', 'ed', 'lc')
+			-gs           = Greedy Search (cost g(x) = 0)
+			-g            = Graphical Interface
+			-dg           = Add numbers to the picture
 ```

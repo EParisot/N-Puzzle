@@ -38,13 +38,14 @@ func (env *Env) parseFile() error {
 }
 
 func printUsage() {
-	fmt.Println(`Usage : ./N-Puzzle[.exe] [-s size] [-m mapFile] [-i imageFile] [-h heuristic] [-g] [-dg]
+	fmt.Println(`Usage : ./N-Puzzle[.exe] [-s size] [-m mapFile] [-i imageFile] [-h heuristic] [-gs] [-g] [-dg]
 			-m mapFile    = 'map_file.map'
 			-i imageFile  = 'image_file.png'
 			-s size       = map size (int)
-			-h heuristic  = 'heuristic' ('md' (default), 'hd', 'i')
-			-dg (Add numbers to the picture)
-			-g (Active graphic)
+			-h heuristic  = 'heuristic' ('md' (default), 'hd', 'ed', 'lc')
+			-gs           = Greedy Search (cost g(x) = 0)
+			-g            = Graphical Interface
+			-dg           = Add numbers to the picture
 			`)
 }
 
@@ -78,6 +79,8 @@ func (env *Env) parseArgs() error {
 			env.digit = true
 		} else if arg == "-g" {
 			env.graph = true
+		} else if arg == "-gs" {
+			env.greedySearch = true
 		}
 	}
 	if env.mapFile == "" {

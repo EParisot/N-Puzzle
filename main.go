@@ -11,18 +11,21 @@ import (
 
 // Env main game struct
 type Env struct {
-	mapFile     string
-	imgFile     string
-	grid        *Grid
-	finishedMap *Grid
-	size        int
-	sizeWindows int
-	heuristic   string
-	digit       bool
-	seed        *rand.Rand
-	graph       bool
-	w           int
-	startTime   time.Time
+	mapFile      string
+	imgFile      string
+	grid         *Grid
+	finishedMap  *Grid
+	size         int
+	sizeWindows  int
+	heuristic    string
+	digit        bool
+	seed         *rand.Rand
+	graph        bool
+	w            int
+	startTime    time.Time
+	timeComp     int
+	sizeComp     int
+	greedySearch bool
 }
 
 // Grid hold the map

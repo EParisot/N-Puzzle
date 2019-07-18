@@ -32,15 +32,19 @@ func (env *Env) reconstructPathIDA(closedList []*Grid, endGrid *Grid) {
 		env.printGrid(step)
 	}
 	fmt.Println("Number of moves required : ", len(closedList))
+	fmt.Println("Number of moves checked : ", env.timeComp)
+	fmt.Println("Max Number of moves represented in memory : ", env.sizeComp)
 }
 
 func (env *Env) idAstar() {
 	threshold := env.globalHeuristic(env.grid)
 	var closedList []*Grid
 	closedList = append(closedList, env.grid)
+	env.timeComp++
+	sizeComp := env.sizeComp
 	env.startTime = time.Now()
 	for {
-		tmpThres, closedList := env.search(threshold, &closedList)
+		tmpThres, closedList, _ := env.search(threshold, &closedList, sizeComp)
 		if tmpThres == -1 {
 			fmt.Println("IDAstar Done")
 			env.reconstructPathIDA(*closedList, (*closedList)[len(*closedList)-1])
@@ -53,30 +57,38 @@ func (env *Env) idAstar() {
 	}
 }
 
-func (env *Env) search(threshold int, closedList *[]*Grid) (int, *[]*Grid) {
+func (env *Env) search(threshold int, closedList *[]*Grid, sizeComp int) (int, *[]*Grid, int) {
 	if time.Since(env.startTime) >= 10000000000 {
 		var closedList []*Grid
 		closedList = append(closedList, env.grid)
 		fmt.Println("Incrementing W to ", env.w+1)
 		env.w++
 		env.startTime = time.Now()
-		return env.globalHeuristic(env.grid), &closedList
+		env.timeComp = 0
+		env.sizeComp = 0
+		return env.globalHeuristic(env.grid), &closedList, sizeComp
+	}
+	sizeComp++
+	if sizeComp > env.sizeComp {
+		env.sizeComp = sizeComp
 	}
 	currGrid := (*closedList)[len(*closedList)-1]
 	if currGrid.heuristic > threshold {
-		return currGrid.heuristic, closedList
+		return currGrid.heuristic, closedList, sizeComp
 	}
 	if env.isFinished(currGrid) {
-		return -1, closedList
+		return -1, closedList, sizeComp
 	}
 	min := 100000
 	childsList := env.getMoves(currGrid)
 	for _, child := range childsList {
 		if !existInClosedList(child, *closedList) {
 			*closedList = append(*closedList, child)
-			tmp, closedList := env.search(threshold, closedList)
+			env.timeComp++
+			tmp, closedList, sizeComp := env.search(threshold, closedList, sizeComp)
 			if tmp == -1 {
-				return -1, closedList
+				sizeComp--
+				return -1, closedList, sizeComp
 			}
 			if tmp < min {
 				min = tmp
@@ -84,11 +96,13 @@ func (env *Env) search(threshold int, closedList *[]*Grid) (int, *[]*Grid) {
 			if len(*closedList) > 1 {
 				*closedList = (*closedList)[:len(*closedList)-1]
 			} else {
-				return tmp, closedList
+				sizeComp--
+				return tmp, closedList, sizeComp
 			}
 		}
 	}
-	return min, closedList
+	sizeComp--
+	return min, closedList, sizeComp
 }
 
 func (env *Env) getMoves(currGrid *Grid) []*Grid {
@@ -120,7 +134,9 @@ func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
 			newGrid.mapping[0].X--
 			newGrid.mapping[i].X++
 		}
-		newGrid.cost = newGrid.cost + 1
+		if env.greedySearch == false {
+			newGrid.cost = newGrid.cost + 1
+		}
 		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)*env.w
 	}
 	return newGrid
