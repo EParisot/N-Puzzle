@@ -94,8 +94,7 @@ func (env *Env) aStar() {
 
 func (env *Env) getMoves(currGrid *Grid) []*Grid {
 	var gridList []*Grid
-	for _, direction := range env.seed.Perm(4) {
-		direction++
+	for direction := 1; direction < 5; direction++ {
 		i := env.checkMove(currGrid, direction)
 		if i >= 0 {
 			newGrid := env.virtualMove(currGrid, direction, i)
