@@ -42,10 +42,10 @@ func (env *Env) idAstar() {
 	closedList = append(closedList, env.grid)
 
 	for {
-		tmpThres, closedList := env.search(threshold, closedList)
+		tmpThres, closedList := env.search(threshold, &closedList)
 		if tmpThres == -1 {
 			fmt.Println("IDAstar Done")
-			env.reconstructPathIDA(closedList, closedList[len(closedList)-1])
+			env.reconstructPathIDA(*closedList, (*closedList)[len(*closedList)-1])
 			return
 		} else if tmpThres >= 100000 {
 			fmt.Println("IDAstar returned no solution")
@@ -55,8 +55,8 @@ func (env *Env) idAstar() {
 	}
 }
 
-func (env *Env) search(threshold int, closedList []*Grid) (int, []*Grid) {
-	currGrid := closedList[len(closedList)-1]
+func (env *Env) search(threshold int, closedList *[]*Grid) (int, *[]*Grid) {
+	currGrid := (*closedList)[len(*closedList)-1]
 	if currGrid.heuristic > threshold {
 		return currGrid.heuristic, closedList
 	}
@@ -66,8 +66,8 @@ func (env *Env) search(threshold int, closedList []*Grid) (int, []*Grid) {
 	min := 100000
 	childsList := env.getMoves(currGrid)
 	for _, child := range childsList {
-		if !existInClosedList(child, closedList) {
-			closedList = append(closedList, child)
+		if !existInClosedList(child, *closedList) {
+			*closedList = append(*closedList, child)
 			tmp, closedList := env.search(threshold, closedList)
 			if tmp == -1 {
 				return -1, closedList
@@ -75,7 +75,7 @@ func (env *Env) search(threshold int, closedList []*Grid) (int, []*Grid) {
 			if tmp < min {
 				min = tmp
 			}
-			closedList = closedList[:len(closedList)-1]
+			*closedList = (*closedList)[:len(*closedList)-1]
 		}
 	}
 	return min, closedList
@@ -83,8 +83,7 @@ func (env *Env) search(threshold int, closedList []*Grid) (int, []*Grid) {
 
 func (env *Env) getMoves(currGrid *Grid) []*Grid {
 	var gridList []*Grid
-	for _, direction := range env.seed.Perm(4) {
-		direction++
+	for direction := 1; direction < 5; direction++ {
 		i := env.checkMove(currGrid, direction)
 		if i >= 0 {
 			newGrid := env.virtualMove(currGrid, direction, i)

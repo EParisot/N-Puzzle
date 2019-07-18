@@ -46,7 +46,7 @@ func main() {
 		finishedMap: &Grid{},
 		heuristic:   "md",
 		seed:        rand.New(rand.NewSource(time.Now().UnixNano())),
-		incrementID: 0,
+		incrementID: -1,
 	}
 	err := env.parseFile()
 	if err != nil {
