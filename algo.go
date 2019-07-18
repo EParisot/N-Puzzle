@@ -38,14 +38,14 @@ func (env *Env) idAstar() {
 	threshold := env.globalHeuristic(env.grid)
 	var closedList []*Grid
 	closedList = append(closedList, env.grid)
-
+	env.startTime = time.Now()
 	for {
 		tmpThres, closedList := env.search(threshold, &closedList)
 		if tmpThres == -1 {
 			fmt.Println("IDAstar Done")
 			env.reconstructPathIDA(*closedList, (*closedList)[len(*closedList)-1])
 			return
-		} else if tmpThres >= 100000 {
+		} else if tmpThres >= 10000 {
 			fmt.Println("IDAstar returned no solution")
 			return
 		}
@@ -54,6 +54,14 @@ func (env *Env) idAstar() {
 }
 
 func (env *Env) search(threshold int, closedList *[]*Grid) (int, *[]*Grid) {
+	if time.Since(env.startTime) >= 10000000000 {
+		var closedList []*Grid
+		closedList = append(closedList, env.grid)
+		fmt.Println("Incrementing W to ", env.w+1)
+		env.w++
+		env.startTime = time.Now()
+		return env.globalHeuristic(env.grid), &closedList
+	}
 	currGrid := (*closedList)[len(*closedList)-1]
 	if currGrid.heuristic > threshold {
 		return currGrid.heuristic, closedList
@@ -73,7 +81,11 @@ func (env *Env) search(threshold int, closedList *[]*Grid) (int, *[]*Grid) {
 			if tmp < min {
 				min = tmp
 			}
-			*closedList = (*closedList)[:len(*closedList)-1]
+			if len(*closedList) > 1 {
+				*closedList = (*closedList)[:len(*closedList)-1]
+			} else {
+				return tmp, closedList
+			}
 		}
 	}
 	return min, closedList

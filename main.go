@@ -22,6 +22,7 @@ type Env struct {
 	seed        *rand.Rand
 	graph       bool
 	w           int
+	startTime   time.Time
 }
 
 // Grid hold the map
