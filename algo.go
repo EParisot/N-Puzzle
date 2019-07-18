@@ -113,7 +113,7 @@ func (env *Env) virtualMove(currGrid *Grid, direction int, i int) *Grid {
 		newGrid.id = env.getID()
 		newGrid.parentID = env.grid.id
 		newGrid.cost = newGrid.cost + 1
-		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)*5
+		newGrid.heuristic = newGrid.cost + env.globalHeuristic(newGrid)
 	}
 	return newGrid
 }
