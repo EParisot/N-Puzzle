@@ -48,7 +48,6 @@ func main() {
 		finishedMap: &Grid{},
 		heuristic:   "md",
 		seed:        rand.New(rand.NewSource(time.Now().UnixNano())),
-		w:           1,
 	}
 	err := env.parseFile()
 	if err != nil {
@@ -58,6 +57,7 @@ func main() {
 	if env.size == 0 {
 		log.Fatal("error missing size value")
 	}
+	env.w = env.size - 2
 	env.sizeWindows = 300 + (300 % env.size)
 	// Default images
 	if env.imgFile == "" {
