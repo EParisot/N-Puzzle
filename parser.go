@@ -97,6 +97,7 @@ func (env *Env) readSize(reader *bufio.Reader) error {
 		len(strings.Fields(firstLine)) > 1 {
 		return errors.New("error missing size value")
 	}
+	firstLine = strings.Replace(firstLine, " ", "", -1)
 	size, err := strconv.Atoi(firstLine)
 	if err != nil || size < 3 || size > 31 {
 		return errors.New("error invalid size value")
