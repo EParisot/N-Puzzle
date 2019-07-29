@@ -58,7 +58,7 @@ func (env *Env) idAstar() {
 }
 
 func (env *Env) search(threshold int, closedList *[]*Grid, sizeComp int) (int, *[]*Grid, int) {
-	if time.Since(env.startTime) >= 10000000000 {
+	if time.Since(env.startTime) >= 5000000000 {
 		var closedList []*Grid
 		closedList = append(closedList, env.grid)
 		fmt.Println("Incrementing W to ", env.w+1)
