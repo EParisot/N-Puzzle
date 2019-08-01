@@ -50,14 +50,16 @@ func (env *Env) update(screen *ebiten.Image) error {
 }
 
 func (env *Env) getKey() {
-	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
-		env.moveCell(env.grid, UP)
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
-		env.moveCell(env.grid, DOWN)
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
-		env.moveCell(env.grid, LEFT)
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
-		env.moveCell(env.grid, RIGHT)
+	if env.startTime.IsZero() {
+		if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+			env.moveCell(env.grid, UP)
+		} else if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+			env.moveCell(env.grid, DOWN)
+		} else if inpututil.IsKeyJustPressed(ebiten.KeyLeft) {
+			env.moveCell(env.grid, LEFT)
+		} else if inpututil.IsKeyJustPressed(ebiten.KeyRight) {
+			env.moveCell(env.grid, RIGHT)
+		}
 	}
 }
 
